@@ -56,7 +56,7 @@ public class HFSwipeView: UIView {
     private var currentRealPage: Int = -1
     private var currentPage: Int = -1
     private var preferredPageConrolHidden: Bool = false
-    private var collectionView: UICollectionView?
+    public var collectionView: UICollectionView?
     private var collectionLayout: HFSwipeViewFlowLayout?
     
     private var initialized: Bool = false

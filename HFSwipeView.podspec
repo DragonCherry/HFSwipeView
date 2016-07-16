@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HFSwipeView'
-  s.version          = '0.1.1'
+  s.version          = '0.1.2'
   s.summary          = 'Infinitely repeating SwipeView for iOS.'
 
 # This description is used to generate tags and improve search results.
@@ -18,11 +18,11 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = 'Swipe view loop through multiple view items infinitely, with UIPageControl attached.'
-  s.homepage         = 'https://bitbucket.org/DragonCherry/hfswipeview'
+  s.homepage         = 'https://github.com/DragonCherry/HFSwipeView'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'DragonCherry' => 'mcpdragon@daum.net' }
-  s.source           = { :git => 'https://bitbucket.org/DragonCherry/hfswipeview.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/DragonCherry/HFSwipeView.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '8.0'
