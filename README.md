@@ -9,6 +9,10 @@
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
+A swipe view loop through multiple view items infinitely, with UIPageControl attached.
+Similar to ViewPager from android but it supports circulation for multiple views. In circulating mode, it automatically locate current view at the center of swipe view.
+
+
 ## Requirements
 
 Uses HFCore utilities in HFSwipeView.
