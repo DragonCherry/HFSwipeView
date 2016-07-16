@@ -11,6 +11,8 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Requirements
 
+Uses HFCore utilities in HFSwipeView.
+
 ## Installation
 
 HFSwipeView is available through [CocoaPods](http://cocoapods.org). To install
