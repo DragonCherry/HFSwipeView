@@ -270,7 +270,7 @@ public class HFSwipeView: UIView {
         log("successfully set content size: \(self.collectionView!.contentSize)")
     }
     
-    internal func layoutViews() {
+    public func layoutViews() {
         
         log("\(#function)")
         
