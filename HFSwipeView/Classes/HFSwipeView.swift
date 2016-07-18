@@ -54,8 +54,23 @@ public class HFSwipeView: UIView {
     
     private var pageControl: UIPageControl!
     private var currentRealPage: Int = -1
-    private var currentPage: Int = -1
-    private var preferredPageConrolHidden: Bool = false
+    public var currentPage: Int = -1
+    public var centerView: UIView? {
+        let center = centerOffset()
+        guard let indexPath = collectionView!.indexPathForItemAtPoint(center) else {
+            logw("Cannot find index path for offset: \(center)")
+            return nil
+        }
+        let visiblePaths = collectionView!.indexPathsForVisibleItems()
+        
+        for visiblePath in visiblePaths {
+            if indexPath.row == visiblePath.row {
+                let cellOnCenter = collectionView!.cellForItemAtIndexPath(visiblePath)
+                return cellOnCenter?.contentView.viewWithTag(kSwipeViewCellContentTag)
+            }
+        }
+        return nil
+    }
     public var collectionView: UICollectionView?
     private var collectionLayout: HFSwipeViewFlowLayout?
     
@@ -107,7 +122,6 @@ public class HFSwipeView: UIView {
     
     public var pageControlHidden: Bool {
         set(hidden) {
-            preferredPageConrolHidden = hidden
             pageControl.hidden = hidden
         }
         get {
@@ -378,6 +392,12 @@ public class HFSwipeView: UIView {
         return NSIndexPath(forItem: minIdx, inSection: 0)
     }
     
+    private func centerOffset() -> CGPoint {
+        var center = self.collectionView!.contentOffset
+        center.x += self.width / 2
+        return center
+    }
+    
     private func centeredOffsetForIndex(indexPath: NSIndexPath) -> CGPoint {
         var newX: CGFloat = 0
         if circulating {
@@ -446,9 +466,7 @@ public class HFSwipeView: UIView {
             index = NSIndexPath(forRow: count - 1, inSection: 0)
         } else {
             // between both side
-            var center = offset
-            center.x += self.width / 2
-            index = collectionView!.indexPathForItemAtPoint(center)
+            index = collectionView!.indexPathForItemAtPoint(centerOffset())
         }
         //        log("size = \(collectionView!.contentSize), offset: \(collectionView!.contentOffset), index: \(index?.row)")
         return index
