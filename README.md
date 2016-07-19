@@ -28,7 +28,7 @@ pod "HFSwipeView"
 
 ## Author
 
-DragonCherry, mcpdragon@daum.net
+DragonCherry, dragoncherry@naver.com
 
 ## License
 
