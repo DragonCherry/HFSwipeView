@@ -34,6 +34,6 @@ Pod::Spec.new do |s|
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  s.dependency 'HFCore'
-  s.dependency 'HFCoreUI'
+  s.dependency 'HFUtility'
+
 end
