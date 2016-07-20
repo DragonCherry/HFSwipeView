@@ -8,6 +8,7 @@
 
 import UIKit
 import HFCore
+import HFCoreUI
 
 @objc public protocol HFSwipeViewDataSource: NSObjectProtocol {
     func swipeViewItemCount(swipeView: HFSwipeView) -> Int
