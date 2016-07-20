@@ -7,8 +7,14 @@
 //
 
 import UIKit
-import HFCore
 import HFSwipeView
+
+extension UIView {
+    public func setBorder(width: CGFloat, color: UIColor) {
+        self.layer.borderWidth = width
+        self.layer.borderColor = color.CGColor
+    }
+}
 
 class ViewController: UIViewController {
     
