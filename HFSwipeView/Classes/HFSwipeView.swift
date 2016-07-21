@@ -9,6 +9,8 @@
 import UIKit
 import HFUtility
 
+
+// MARK: - HFSwipeViewDataSource
 @objc public protocol HFSwipeViewDataSource: NSObjectProtocol {
     func swipeViewItemCount(swipeView: HFSwipeView) -> Int
     func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize
@@ -17,12 +19,16 @@ import HFUtility
     optional func swipeViewItemDistance(swipeView: HFSwipeView) -> CGFloat
 }
 
+
+// MARK: - HFSwipeViewDelegate
 @objc public protocol HFSwipeViewDelegate: NSObjectProtocol {
     optional func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath)
     optional func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath)
     optional func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath)
 }
 
+
+// MARK: - HFSwipeViewFlowLayout
 class HFSwipeViewFlowLayout: UICollectionViewFlowLayout {
     
     weak var swipeView: HFSwipeView!
@@ -45,16 +51,33 @@ class HFSwipeViewFlowLayout: UICollectionViewFlowLayout {
     }
 }
 
+
+// MARK: - HFSwipeView
 public class HFSwipeView: UIView {
     
+    // MARK: Private Constants
     private var kSwipeViewCellContentTag: Int!
     private let kSwipeViewCellIdentifier = NSUUID().UUIDString
     private let kPageControlHeight: CGFloat = 20
     private let kPageControlHorizontalPadding: CGFloat = 10
     
+    // MARK: Private Variables
+    private var initialized: Bool = false
+    private var canUpdateWhileScrolling: Bool = true
+    private var fixingOffset: Bool = false
+    private var itemSize: CGSize? = nil
+    private var itemSpace: CGFloat = 0
+    private var realViewCount: Int = 0                  // real item count includes fake views on both side
+    private var dummyCount: Int = 0
+    private var dummyWidth: CGFloat = 0
     private var pageControl: UIPageControl!
     private var currentRealPage: Int = -1
+    private var collectionLayout: HFSwipeViewFlowLayout?
+    
+    // MARK: Public Properties
     public var currentPage: Int = -1
+    public var collectionView: UICollectionView?
+    
     public var centerView: UIView? {
         let center = centerOffset()
         guard let indexPath = collectionView!.indexPathForItemAtPoint(center) else {
@@ -71,19 +94,8 @@ public class HFSwipeView: UIView {
         }
         return nil
     }
-    public var collectionView: UICollectionView?
-    private var collectionLayout: HFSwipeViewFlowLayout?
     
-    private var initialized: Bool = false
-    private var canUpdateWhileScrolling: Bool = true
-    private var fixingOffset: Bool = false
-    private var itemSize: CGSize? = nil
-    private var itemSpace: CGFloat = 0
-    private var realViewCount: Int = 0                                        // real item count includes fake views on both side
-    private var dummyCount: Int = 0
-    private var dummyWidth: CGFloat = 0
     
-    // MARK: - Properties
     public var collectionBackgroundColor: UIColor? {
         set {
             collectionView!.backgroundView?.backgroundColor = newValue
@@ -145,7 +157,7 @@ public class HFSwipeView: UIView {
         }
     }
     
-    // MARK: - Lifecycle
+    // MARK: Lifecycle
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         commonInit()
@@ -166,17 +178,8 @@ public class HFSwipeView: UIView {
         layoutViews()
     }
     
-    public func deselectItemAtPath(indexPath: NSIndexPath, animated: Bool) {
-        self.collectionView?.deselectItemAtIndexPath(indexPath, animated: animated)
-    }
-    
-    private func prepareForInteraction() {
-        initialized = true
-        collectionView!.userInteractionEnabled = true
-    }
-    
-    // MARK: - Load & Layout
-    internal func loadViews() {
+    // MARK: Load & Layout
+    private func loadViews() {
         
         self.backgroundColor = UIColor.clearColor()
         
@@ -205,6 +208,11 @@ public class HFSwipeView: UIView {
         addSubview(pageControl)
     }
     
+    private func prepareForInteraction() {
+        initialized = true
+        collectionView!.userInteractionEnabled = true
+    }
+    
     private func calculate() {
         
         // retrieve item distance
@@ -226,10 +234,6 @@ public class HFSwipeView: UIView {
         
         // retrieve item count
         let itemCount = integer(self.dataSource?.swipeViewItemCount(self), defaultValue: 0)
-        
-        if tag == 0 && itemCount != 0 {
-            log("CATEGORY SWIPEVIEW")
-        }
         
         // pixel correction
         let neededSpace = (itemSize.width + itemSpace) * CGFloat(itemCount) - (circulating ? 0 : itemSpace)
@@ -283,7 +287,12 @@ public class HFSwipeView: UIView {
         collectionView!.contentSize = contentSize
         log("successfully set content size: \(self.collectionView!.contentSize)")
     }
-    
+}
+
+
+
+// MARK: - Public APIs
+extension HFSwipeView {
     public func layoutViews() {
         
         log("\(#function)")
@@ -336,6 +345,15 @@ public class HFSwipeView: UIView {
         moveRealPage(indexPath.row, animated: animated)
     }
     
+    public func deselectItemAtPath(indexPath: NSIndexPath, animated: Bool) {
+        self.collectionView?.deselectItemAtIndexPath(indexPath, animated: animated)
+    }
+}
+
+
+
+// MARK: - Private Methods
+extension HFSwipeView {
     private func moveRealPage(realPage: Int, animated: Bool) {
         log("\(#function): \(realPage)")
         canUpdateWhileScrolling = false
@@ -530,6 +548,7 @@ public class HFSwipeView: UIView {
         //        log("\(#function): real -> \(indexPath.row)")
     }
 }
+
 
 // MARK: - UICollectionViewDataSource
 extension HFSwipeView: UICollectionViewDataSource {
