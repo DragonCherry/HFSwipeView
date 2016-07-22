@@ -15,7 +15,7 @@ Any advice and suggestions will be greatly appreciated.
 
 ## Requirements
 
-Uses HFCore utilities in HFSwipeView.
+Uses HFUtility in HFSwipeView.
 
 ## Installation
 
