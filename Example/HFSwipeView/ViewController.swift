@@ -19,16 +19,16 @@ extension UIView {
 class ViewController: UIViewController {
     
     // sample item count for two swipe view
-    private let sampleCount: Int = 4
+    private let sampleCount: Int = 10
     private let kMultiTag: Int = 100
     private let kFullTag: Int = 101
     
     // where multi swipe view will be placed
     private var multiItemSize: CGSize {
-        return CGSize(width: 100, height: 50)
+        return CGSize(width: self.view.width / 4, height: 50)
     }
     private var multiViewRect: CGRect {
-        return CGRectMake(0, 20, 300, 50)
+        return CGRectMake(0, 20, self.view.width, 50)
     }
     
     // where full swipe view will be placed
@@ -36,11 +36,11 @@ class ViewController: UIViewController {
         return CGRectMake(
             0,
             multiViewRect.origin.y + multiViewRect.height,
-            300,
+            self.view.width,
             self.view.height - (multiViewRect.origin.y + multiViewRect.height))
     }
     private var fullItemSize: CGSize {
-        return CGSize(width: 300, height: fullViewRect.height)
+        return CGSize(width: 335, height: fullViewRect.height)
     }
     
     private var swipeViewMulti: HFSwipeView? = nil
@@ -105,7 +105,7 @@ extension ViewController: HFSwipeViewDataSource {
     }
     func swipeViewItemCount(swipeView: HFSwipeView) -> Int {
         if swipeView.tag == kMultiTag {
-            return 4
+            return sampleCount
         } else {
             return sampleCount
         }

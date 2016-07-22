@@ -265,20 +265,21 @@ public class HFSwipeView: UIView {
         }
         
         if circulating {
-            let multiplier = Int(self.width / (itemSize.width + itemSpace))
-            var remainder = self.width - (itemSize.width + itemSpace) * CGFloat(multiplier)
-            
-            if 0 < remainder && remainder < 1 {
-                // ignore tiny space
-                remainder = 0
-            }
-            if remainder > 0 {
-                dummyCount = multiplier + 1
-            } else if remainder == 0 {
-                dummyCount = multiplier
-            } else {
-                loge("check calculation logic")
-            }
+//            let multiplier = Int(self.width / (itemSize.width + itemSpace))
+//            var remainder = self.width - (itemSize.width + itemSpace) * CGFloat(multiplier)
+//            
+//            if 0 < remainder && remainder < 1 {
+//                // ignore tiny space
+//                remainder = 0
+//            }
+//            if remainder > 0 {
+//                dummyCount = multiplier + 1
+//            } else if remainder == 0 {
+//                dummyCount = multiplier
+//            } else {
+//                loge("check calculation logic")
+//            }
+            dummyCount = itemCount
             if dummyCount >= 1 {
                 dummyWidth = CGFloat(dummyCount) * (itemSize.width + itemSpace)
                 log("successfully set dummyCount: \(dummyCount), dummyWidth: \(dummyWidth)")
@@ -361,8 +362,9 @@ extension HFSwipeView {
         }
         let indexToMove = NSIndexPath(forItem: page, inSection: 0)
         let currentRealIndex = NSIndexPath(forItem: currentRealPage, inSection: 0)
-        let indexPath = naturalIndexTo(indexToMove, from: currentRealIndex, direction: direction)
-        moveRealPage(indexPath.row, animated: animated)
+        if let indexPath = naturalIndexTo(indexToMove, from: currentRealIndex, direction: direction) {
+            moveRealPage(indexPath.row, animated: animated)
+        }
     }
     
     public func deselectItemAtPath(indexPath: NSIndexPath, animated: Bool) {
@@ -436,7 +438,7 @@ extension HFSwipeView {
         return NSIndexPath(forItem: minIdx, inSection: 0)
     }
     
-    private func naturalIndexTo(showingIndex: NSIndexPath, from: NSIndexPath, direction: UIRectEdge? = nil) -> NSIndexPath {
+    private func naturalIndexTo(showingIndex: NSIndexPath, from: NSIndexPath, direction: UIRectEdge? = nil) -> NSIndexPath? {
         
         guard let direction = direction else {
             return closestIndexTo(showingIndex)
@@ -469,18 +471,21 @@ extension HFSwipeView {
         }
         
         if destIndex == nil {
-            destIndex = closestIndexTo(showingIndex)
-            log("Could not find target index(\(showingIndex.row)) at \(direction == .Left ? "Left" : "Right"), insert fake animation for circulation.")
+            
+            // fallback logic, maybe cannot reach here.
+            let alterIndex = closestIndexTo(showingIndex)
+            loge("Could not find target index(\(showingIndex.row)) at \(direction == .Left ? "Left" : "Right"), insert fake animation for circulation.")
             
             let duration: NSTimeInterval = 0.3
             if direction == .Left {
                 UIView.animateWithDuration(
                     duration,
-                    animations: { 
-                        self.collectionView!.setContentOffset(CGPointZero, animated: false)
+                    animations: {
+                        let offset = self.centeredOffsetForIndex(NSIndexPath(forItem: 0, inSection: 0))
+                        self.collectionView!.setContentOffset(offset, animated: false)
                     },
                     completion: { (finished) in
-                        let fixedOffset = self.centeredOffsetForIndex(destIndex!)
+                        let fixedOffset = self.centeredOffsetForIndex(alterIndex)
                         self.collectionView!.setContentOffset(fixedOffset, animated: true)
                 })
             } else {
@@ -491,14 +496,15 @@ extension HFSwipeView {
                         self.collectionView!.setContentOffset(endOffset, animated: false)
                     },
                     completion: { (finished) in
-                        let fixedOffset = self.centeredOffsetForIndex(destIndex!)
+                        let fixedOffset = self.centeredOffsetForIndex(alterIndex)
                         self.collectionView!.setContentOffset(fixedOffset, animated: true)
                 })
             }
+            loge("\(#function)[\(self.tag)]: direction: \(direction == .Left ? "Left" : "Right"), showingIndex: \(showingIndex.row) - start(\(start)) -> destIndex(\(alterIndex.row))")
+        } else {
+            log("\(#function)[\(self.tag)]: direction: \(direction == .Left ? "Left" : "Right"), showingIndex: \(showingIndex.row) - start(\(start)) -> destIndex(\(destIndex?.row))")
         }
-        
-        log("\(#function)[\(self.tag)]: direction: \(direction == .Left ? "Left" : "Right"), showingIndex: \(showingIndex.row) - start(\(start)) -> destIndex(\(destIndex?.row))")
-        return destIndex!
+        return destIndex
     }
     
     private func centerOffset() -> CGPoint {
@@ -677,19 +683,39 @@ extension HFSwipeView {
             scrollView.contentOffset = CGPoint(x: self.dummyWidth + delta, y: 0)
             log("\(#function)[\(self.tag)]: moved to first view!, offset: \(scrollView.contentOffset)")
             return true
+        } else {
+            determineDirection(scrollView)
         }
         return false
     }
     
+    private func determineDirection(scrollView: UIScrollView) {
+        if !circulating {
+            return
+        }
+        let newX = scrollView.contentOffset.x
+        if newX <= dummyWidth || newX >= scrollView.contentSize.width - dummyWidth {
+            log("\(#function)[\(self.tag)]: ignore at dummy area")
+            return
+        }
+        if lastX < scrollView.contentOffset.x {
+            lastDirection = .Right
+        } else if lastX > scrollView.contentOffset.x {
+            lastDirection = .Left
+        }
+        log("\(#function)[\(self.tag)]: lastX(\(lastX)), offset(\(scrollView.contentOffset.x)), lastDirection: \(lastDirection == .Left ? "Left" : "Right")")
+        lastX = scrollView.contentOffset.x
+    }
+    
     private func updateDirection() {
-//        if lastX > collectionView!.contentOffset.x {
-//            lastDirection = .Left
-//        } else if lastX < collectionView!.contentOffset.x {
-//            lastDirection = .Left
-//        } else {
-//            logw("check logic")
-//        }
-//        log("\(#function)[\(self.tag)]: \(lastDirection == .Left ? "Left" : "Right")")
+        if lastX > collectionView!.contentOffset.x {
+            lastDirection = .Left
+        } else if lastX < collectionView!.contentOffset.x {
+            lastDirection = .Left
+        } else {
+            logw("check logic")
+        }
+        log("\(#function)[\(self.tag)]: \(lastDirection == .Left ? "Left" : "Right")")
     }
     
     private func updateDirection(withHorizontalVelocity velocity: CGFloat) {
@@ -838,8 +864,6 @@ extension HFSwipeView: UIScrollViewDelegate {
     }
     
     public func scrollViewDidScroll(scrollView: UIScrollView) {
-        
-        lastX = scrollView.x
         
         if !initialized || scrollView.contentSize.width <= 0 {
             // ignore invalid status
