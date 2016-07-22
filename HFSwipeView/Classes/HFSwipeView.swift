@@ -22,7 +22,9 @@ import HFUtility
 
 // MARK: - HFSwipeViewDelegate
 @objc public protocol HFSwipeViewDelegate: NSObjectProtocol {
+    optional func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath)
     optional func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath, scrolledDirection: UIRectEdge)
+    optional func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath)
     optional func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath, tappedDirection: UIRectEdge)
     optional func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath)
     optional func swipeViewWillBeginDragging(swipeView: HFSwipeView)
@@ -265,20 +267,20 @@ public class HFSwipeView: UIView {
         }
         
         if circulating {
-//            let multiplier = Int(self.width / (itemSize.width + itemSpace))
-//            var remainder = self.width - (itemSize.width + itemSpace) * CGFloat(multiplier)
-//            
-//            if 0 < remainder && remainder < 1 {
-//                // ignore tiny space
-//                remainder = 0
-//            }
-//            if remainder > 0 {
-//                dummyCount = multiplier + 1
-//            } else if remainder == 0 {
-//                dummyCount = multiplier
-//            } else {
-//                loge("check calculation logic")
-//            }
+            //            let multiplier = Int(self.width / (itemSize.width + itemSpace))
+            //            var remainder = self.width - (itemSize.width + itemSpace) * CGFloat(multiplier)
+            //
+            //            if 0 < remainder && remainder < 1 {
+            //                // ignore tiny space
+            //                remainder = 0
+            //            }
+            //            if remainder > 0 {
+            //                dummyCount = multiplier + 1
+            //            } else if remainder == 0 {
+            //                dummyCount = multiplier
+            //            } else {
+            //                loge("check calculation logic")
+            //            }
             dummyCount = itemCount
             if dummyCount >= 1 {
                 dummyWidth = CGFloat(dummyCount) * (itemSize.width + itemSpace)
@@ -597,7 +599,7 @@ extension HFSwipeView {
             } else {
                 showingIndex = realIndex.row - count - dummyCount
             }
-//            log("\(#function)[\(self.tag)]: \(realIndex.row) -> \(showingIndex)")
+            //            log("\(#function)[\(self.tag)]: \(realIndex.row) -> \(showingIndex)")
             return NSIndexPath(forItem: showingIndex, inSection: 0)
         } else {
             return NSIndexPath(forItem: realIndex.row, inSection: 0)
@@ -653,7 +655,7 @@ extension HFSwipeView {
                 self.delegate?.swipeView?(self, didChangeIndexPath: showingIndex)
             }
         }
-//        log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
+        //        log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
     }
     
     private func autoAlign(scrollView: UIScrollView, indexPath: NSIndexPath) {
@@ -877,7 +879,7 @@ extension HFSwipeView: UIScrollViewDelegate {
         if let index = indexPathForItemAtPoint(scrollView.contentOffset) {
             updateIndex(index)
         }
-//        log("\(#function): \(scrollView.contentOffset.x)")
+        //        log("\(#function): \(scrollView.contentOffset.x)")
     }
     
     public func scrollViewWillBeginDecelerating(scrollView: UIScrollView) {
