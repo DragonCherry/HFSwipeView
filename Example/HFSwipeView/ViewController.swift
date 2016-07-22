@@ -19,16 +19,16 @@ extension UIView {
 class ViewController: UIViewController {
     
     // sample item count for two swipe view
-    private let sampleCount: Int = 7
-    private let kFullTag: Int = 100
-    private let kMultiTag: Int = 101
+    private let sampleCount: Int = 4
+    private let kMultiTag: Int = 100
+    private let kFullTag: Int = 101
     
     // where multi swipe view will be placed
     private var multiItemSize: CGSize {
-        return CGSize(width: self.view.width / 3.5, height: 50)
+        return CGSize(width: 100, height: 50)
     }
     private var multiViewRect: CGRect {
-        return CGRectMake(0, 20, self.view.width, 50)
+        return CGRectMake(0, 20, 300, 50)
     }
     
     // where full swipe view will be placed
@@ -36,11 +36,11 @@ class ViewController: UIViewController {
         return CGRectMake(
             0,
             multiViewRect.origin.y + multiViewRect.height,
-            self.view.width,
+            300,
             self.view.height - (multiViewRect.origin.y + multiViewRect.height))
     }
     private var fullItemSize: CGSize {
-        return CGSize(width: self.view.width, height: fullViewRect.height)
+        return CGSize(width: 300, height: fullViewRect.height)
     }
     
     private var swipeViewMulti: HFSwipeView? = nil
@@ -104,7 +104,11 @@ extension ViewController: HFSwipeViewDataSource {
         }
     }
     func swipeViewItemCount(swipeView: HFSwipeView) -> Int {
-        return sampleCount
+        if swipeView.tag == kMultiTag {
+            return 4
+        } else {
+            return sampleCount
+        }
     }
     func swipeView(swipeView: HFSwipeView, viewForIndexPath indexPath: NSIndexPath) -> UIView {
         
@@ -139,12 +143,22 @@ extension ViewController: HFSwipeViewDataSource {
 
 // MARK: - HFSwipeViewDelegate
 extension ViewController: HFSwipeViewDelegate {
-    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath) {
+    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath, scrolledDirection: UIRectEdge) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        if swipeView.tag == kMultiTag {
+            swipeViewFull?.movePage(indexPath.row, animated: true, direction: scrolledDirection)
+        } else {
+            swipeViewMulti?.movePage(indexPath.row, animated: true, direction: scrolledDirection)
+        }
     }
     
-    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath) {
+    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath, tappedDirection: UIRectEdge) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        if swipeView.tag == kMultiTag {
+            swipeViewFull?.movePage(indexPath.row, animated: true, direction: tappedDirection)
+        } else {
+            swipeViewMulti?.movePage(indexPath.row, animated: true, direction: tappedDirection)
+        }
     }
     
     func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath) {
