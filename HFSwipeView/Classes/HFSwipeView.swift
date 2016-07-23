@@ -702,7 +702,7 @@ extension HFSwipeView {
         } else if lastScrolledPosition.x > scrollView.contentOffset.x {
             scrollDirection = .Left
         }
-        log("\(#function)[\(self.tag)]: lastX(\(lastScrolledPosition.x)), offset(\(scrollView.contentOffset.x)), scrollDirection: \(scrollDirection == .Left ? "Left" : "Right")")
+//        log("\(#function)[\(self.tag)]: lastX(\(lastScrolledPosition.x)), offset(\(scrollView.contentOffset.x)), scrollDirection: \(scrollDirection == .Left ? "Left" : "Right")")
         lastScrolledPosition = scrollView.contentOffset
     }
     
