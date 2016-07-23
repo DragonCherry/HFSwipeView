@@ -40,7 +40,7 @@ class ViewController: UIViewController {
             self.view.height - (multiViewRect.origin.y + multiViewRect.height))
     }
     private var fullItemSize: CGSize {
-        return CGSize(width: 335, height: fullViewRect.height)
+        return CGSize(width: self.view.width, height: fullViewRect.height)
     }
     
     private var swipeViewMulti: HFSwipeView? = nil
@@ -78,16 +78,15 @@ class ViewController: UIViewController {
         swipeViewFull!.setBorder(0.5, color: UIColor.blackColor())
         swipeViewFull!.backgroundColor = UIColor.clearColor()
         self.view.addSubview(self.swipeViewFull!)
+        
+        swipeViewMulti!.addSyncView(swipeViewFull!)
+        swipeViewFull!.addSyncView(swipeViewMulti!)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         self.swipeViewFull!.frame = fullViewRect
         self.swipeViewMulti!.frame = multiViewRect
-    }
-    
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
     }
 }
 
@@ -143,25 +142,15 @@ extension ViewController: HFSwipeViewDataSource {
 
 // MARK: - HFSwipeViewDelegate
 extension ViewController: HFSwipeViewDelegate {
-    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath, scrolledDirection: UIRectEdge) {
+    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath, direction: UIRectEdge) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
-        if swipeView.tag == kMultiTag {
-            swipeViewFull?.movePage(indexPath.row, animated: true, direction: scrolledDirection)
-        } else {
-            swipeViewMulti?.movePage(indexPath.row, animated: true, direction: scrolledDirection)
-        }
     }
     
-    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath, tappedDirection: UIRectEdge) {
+    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath, direction: UIRectEdge) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
-        if swipeView.tag == kMultiTag {
-            swipeViewFull?.movePage(indexPath.row, animated: true, direction: tappedDirection)
-        } else {
-            swipeViewMulti?.movePage(indexPath.row, animated: true, direction: tappedDirection)
-        }
     }
     
-    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath) {
+    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, direction: UIRectEdge) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
 }
