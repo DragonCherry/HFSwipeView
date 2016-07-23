@@ -23,10 +23,11 @@ import HFUtility
 // MARK: - HFSwipeViewDelegate
 @objc public protocol HFSwipeViewDelegate: NSObjectProtocol {
     optional func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath)
-    optional func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath, scrolledDirection: UIRectEdge)
+    optional func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath, direction: UIRectEdge)
     optional func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath)
-    optional func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath, tappedDirection: UIRectEdge)
+    optional func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath, direction: UIRectEdge)
     optional func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath)
+    optional func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, direction: UIRectEdge)
     optional func swipeViewWillBeginDragging(swipeView: HFSwipeView)
     optional func swipeViewDidEndDragging(swipeView: HFSwipeView)
 }
@@ -648,9 +649,10 @@ extension HFSwipeView {
             pageControl.currentPage = showingIndex.row
             if notifyWhileScrolling {
                 self.delegate?.swipeView?(self, didChangeIndexPath: showingIndex)
+                self.delegate?.swipeView?(self, didChangeIndexPath: showingIndex, direction: lastDirection)
             }
         }
-        //        log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
+//        log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
     }
     
     private func autoAlign(scrollView: UIScrollView, indexPath: NSIndexPath) {
@@ -705,12 +707,16 @@ extension HFSwipeView {
     }
     
     private func determineDirection(withHorizontalVelocity velocity: CGFloat) {
-        lastVelocity = velocity
+        
+        if velocity != 0 {
+            lastVelocity = velocity
+        }
         if lastVelocity > 0 {
             velocityDirection = .Right
         } else if lastVelocity < 0 {
             velocityDirection = .Left
         }
+        log("\(#function)[\(self.tag)]: velocity: \(lastVelocity)")
         log("\(#function)[\(self.tag)]: velocityDirection: \(velocityDirection == .Left ? "Left" : "Right")")
     }
     
@@ -787,7 +793,8 @@ extension HFSwipeView: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 extension HFSwipeView: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        self.delegate?.swipeView?(self, didSelectItemAtPath: showingIndexUsing(indexPath), tappedDirection: tapDirection)
+        delegate?.swipeView?(self, didSelectItemAtPath: showingIndexUsing(indexPath))
+        delegate?.swipeView?(self, didSelectItemAtPath: showingIndexUsing(indexPath), direction: tapDirection)
         moveRealPage(indexPath.row, animated: true)
         updateIndex(indexPath)
     }
@@ -901,7 +908,8 @@ extension HFSwipeView: UIScrollViewDelegate {
         
         log("\(#function): real -> \(indexPath.row)")
         let showingIndex = showingIndexUsing(indexPath)
-        delegate?.swipeView?(self, didFinishScrollAtIndexPath: showingIndex, scrolledDirection: lastDirection)
+        delegate?.swipeView?(self, didFinishScrollAtIndexPath: showingIndex)
+        delegate?.swipeView?(self, didFinishScrollAtIndexPath: showingIndex, direction: lastDirection)
         updateIndex(indexPath)
         
         if circulating {
