@@ -23,6 +23,8 @@ class ViewController: UIViewController {
     private let kMultiTag: Int = 100
     private let kFullTag: Int = 101
     
+    private var currentMultiView: UILabel?
+    
     // where multi swipe view will be placed
     private var multiItemSize: CGSize {
         return CGSize(width: self.view.width / 4, height: 50)
@@ -86,8 +88,12 @@ class ViewController: UIViewController {
         self.swipeViewMulti!.frame = multiViewRect
     }
     
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
+    func colorForIndex(index: Int) -> UIColor {
+        return UIColor(
+            alpha: 1,
+            red: (((255 - 150) / sampleCount) * index + 150) % 256,
+            green: 200,
+            blue: (((255 - 150) / sampleCount) * index + 150) % 256)
     }
 }
 
@@ -134,6 +140,14 @@ extension ViewController: HFSwipeViewDataSource {
         if let label = view as? UILabel {
             label.text = "\(indexPath.row)"
             label.setBorder(0.5, color: UIColor.blackColor())
+            
+            switch swipeView.tag {
+//            case kMultiTag:
+            case kFullTag:
+                label.backgroundColor = colorForIndex(indexPath.row)
+            default:
+                break
+            }
         } else {
             assertionFailure("failed to retrieve button for index: \(indexPath.row)")
         }
