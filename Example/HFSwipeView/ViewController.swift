@@ -79,8 +79,8 @@ class ViewController: UIViewController {
         swipeViewFull!.backgroundColor = UIColor.clearColor()
         self.view.addSubview(self.swipeViewFull!)
         
-        swipeViewMulti!.addSyncView(swipeViewFull!)
-        swipeViewFull!.addSyncView(swipeViewMulti!)
+        swipeViewMulti!.syncView = swipeViewFull
+        swipeViewFull!.syncView = swipeViewMulti
     }
     
     override func viewDidLayoutSubviews() {
