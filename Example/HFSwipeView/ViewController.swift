@@ -80,6 +80,9 @@ class ViewController: UIViewController {
         swipeViewFull!.setBorder(0.5, color: UIColor.blackColor())
         swipeViewFull!.backgroundColor = UIColor.clearColor()
         self.view.addSubview(self.swipeViewFull!)
+        
+        swipeViewMulti!.syncView = swipeViewFull
+        swipeViewFull!.syncView = swipeViewMulti
     }
     
     override func viewDidLayoutSubviews() {
@@ -159,26 +162,13 @@ extension ViewController: HFSwipeViewDataSource {
 extension ViewController: HFSwipeViewDelegate {
     func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath, direction: UIRectEdge) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
-        if swipeView.tag == kMultiTag {
-            swipeViewFull?.movePage(indexPath.row, animated: true, direction: direction)
-        } else {
-            swipeViewMulti?.movePage(indexPath.row, animated: true, direction: direction)
-        }
     }
     
     func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath, direction: UIRectEdge) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
-        if swipeView.tag == kMultiTag {
-            swipeViewFull?.movePage(indexPath.row, animated: true, direction: direction)
-        } else {
-            swipeViewMulti?.movePage(indexPath.row, animated: true, direction: direction)
-        }
     }
     
     func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, direction: UIRectEdge) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
-        if swipeView.tag == kFullTag {
-            swipeViewMulti?.movePage(indexPath.row, animated: true, direction: direction)
-        }
     }
 }
