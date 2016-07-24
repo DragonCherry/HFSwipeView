@@ -16,6 +16,7 @@ import HFUtility
     func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize
     func swipeView(swipeView: HFSwipeView, viewForIndexPath indexPath: NSIndexPath) -> UIView
     optional func swipeView(swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: NSIndexPath, view: UIView)
+    optional func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView)
     optional func swipeViewItemDistance(swipeView: HFSwipeView) -> CGFloat
 }
 
@@ -69,6 +70,7 @@ public class HFSwipeView: UIView {
     private var itemSpace: CGFloat = 0
     private var pageControl: UIPageControl!
     private var collectionLayout: HFSwipeViewFlowLayout?
+    private var indexViewMapper = [Int: UIView]()
     
     // MARK: Loop Control Variables
     private var notifyWhileScrolling: Bool = true
@@ -83,24 +85,6 @@ public class HFSwipeView: UIView {
     // MARK: Public Properties
     public var currentPage: Int = -1
     public var collectionView: UICollectionView?
-    
-    public var centerView: UIView? {
-        let center = centerOffset()
-        guard let indexPath = collectionView!.indexPathForItemAtPoint(center) else {
-            logw("Cannot find index path for offset: \(center)")
-            return nil
-        }
-        let visiblePaths = collectionView!.indexPathsForVisibleItems()
-        
-        for visiblePath in visiblePaths {
-            if indexPath.row == visiblePath.row {
-                let cellOnCenter = collectionView!.cellForItemAtIndexPath(visiblePath)
-                return cellOnCenter?.contentView.viewWithTag(kSwipeViewCellContentTag)
-            }
-        }
-        return nil
-    }
-    
     
     public var collectionBackgroundColor: UIColor? {
         set {
@@ -599,7 +583,12 @@ extension HFSwipeView {
         if oldPage != currentPage {
             pageControl.currentPage = showingIndex.row
             if notifyWhileScrolling {
-                self.delegate?.swipeView?(self, didChangeIndexPath: showingIndex)
+                if let view = indexViewMapper[currentPage] {
+                    dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: showingIndex, view: view)
+                    delegate?.swipeView?(self, didChangeIndexPath: showingIndex)
+                } else {
+                    loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(indexPath.row)")
+                }
             }
             log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
         }
@@ -652,44 +641,84 @@ extension HFSwipeView: UICollectionViewDataSource {
     
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
+        if circulating {
+            return cellForItemInCirculationMode(collectionView, indexPath: indexPath)
+        } else {
+            return cellForItemInNormalMode(collectionView, indexPath: indexPath)
+        }
+    }
+    
+    private func cellForItemInCirculationMode(collectionView: UICollectionView, indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell: UICollectionViewCell = collectionView.dequeueReusableCellWithReuseIdentifier(kSwipeViewCellIdentifier, forIndexPath: indexPath)
         guard let dataSource = self.dataSource else {
             loge("dataSource is nil")
             return cell
         }
         
-        let indexToUse: NSIndexPath = circulating ? self.showingIndexUsing(indexPath) : indexPath
+        let showingIndex: NSIndexPath = showingIndexUsing(indexPath)
         var cellView: UIView? = nil
         
         if recycleEnabled {
             // user-created content view may exists while recycling is enabled
             cellView = cell.contentView.viewWithTag(kSwipeViewCellContentTag)
         }
-        
         if cellView == nil {
             // set cellView as newly created view
-            cellView = dataSource.swipeView(self, viewForIndexPath: indexToUse)
+            cellView = dataSource.swipeView(self, viewForIndexPath: showingIndex)
+            cellView!.tag = kSwipeViewCellContentTag
+        }
+        indexViewMapper[showingIndex.row] = cellView
+        
+        if recycleEnabled {
+            dataSource.swipeView?(self, needUpdateViewForIndexPath: showingIndex, view: cellView!)
+        }
+        
+        if showingIndex.row == currentPage {
+            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: showingIndex, view: cellView!)
+        }
+        
+        // locate content view at center of given cell
+        cellView!.frame.origin.x = itemSpace / 2
+        cell.contentView.addSubview(cellView!)
+        return cell
+    }
+    
+    private func cellForItemInNormalMode(collectionView: UICollectionView, indexPath: NSIndexPath) -> UICollectionViewCell {
+        let cell: UICollectionViewCell = collectionView.dequeueReusableCellWithReuseIdentifier(kSwipeViewCellIdentifier, forIndexPath: indexPath)
+        guard let dataSource = self.dataSource else {
+            loge("dataSource is nil")
+            return cell
+        }
+        
+        var cellView: UIView? = nil
+        
+        if recycleEnabled {
+            // user-created content view may exists while recycling is enabled
+            cellView = cell.contentView.viewWithTag(kSwipeViewCellContentTag)
+        }
+        if cellView == nil {
+            // set cellView as newly created view
+            cellView = dataSource.swipeView(self, viewForIndexPath: indexPath)
             cellView!.tag = kSwipeViewCellContentTag
         }
         
         if recycleEnabled {
-            dataSource.swipeView?(self, needUpdateViewForIndexPath: indexToUse, view: cellView!)
+            dataSource.swipeView?(self, needUpdateViewForIndexPath: indexPath, view: cellView!)
         }
-        if circulating {
+        
+        if indexPath.row == currentPage {
+            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: indexPath, view: cellView!)
+        }
+
+        // place view on cell
+        if indexPath.row == 0 && count > 1 {
+            cellView!.frame.origin.x = 0
+        } else {
             // locate content view at center of given cell
             cellView!.frame.origin.x = itemSpace / 2
-            cell.contentView.addSubview(cellView!)
-            return cell
-        } else {
-            if indexPath.row == 0 && count > 1 {
-                cellView!.frame.origin.x = 0
-            } else {
-                // locate content view at center of given cell
-                cellView!.frame.origin.x = itemSpace / 2
-            }
-            cell.contentView.addSubview(cellView!)
-            return cell
         }
+        cell.contentView.addSubview(cellView!)
+        return cell
     }
     
     public func collectionView(collectionView: UICollectionView, didEndDisplayingCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {

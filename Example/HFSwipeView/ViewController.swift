@@ -23,7 +23,7 @@ class ViewController: UIViewController {
     private let kMultiTag: Int = 100
     private let kFullTag: Int = 101
     
-    private var currentMultiView: UILabel?
+    private var currentItemView: UILabel?
     
     // where multi swipe view will be placed
     private var multiItemSize: CGSize {
@@ -146,6 +146,7 @@ extension ViewController: HFSwipeViewDataSource {
             
             switch swipeView.tag {
 //            case kMultiTag:
+//                
             case kFullTag:
                 label.backgroundColor = colorForIndex(indexPath.row)
             default:
@@ -155,20 +156,28 @@ extension ViewController: HFSwipeViewDataSource {
             assertionFailure("failed to retrieve button for index: \(indexPath.row)")
         }
     }
+    func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+        if swipeView.tag == kMultiTag {
+            currentItemView?.setBorder(0.5, color: UIColor.blackColor())
+            currentItemView = view as? UILabel
+            currentItemView?.setBorder(2, color: UIColor.redColor())
+        }
+    }
 }
 
 
 // MARK: - HFSwipeViewDelegate
 extension ViewController: HFSwipeViewDelegate {
-    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath, direction: UIRectEdge) {
+    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath, direction: UIRectEdge) {
+    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, direction: UIRectEdge) {
+    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, changedView view: UIView) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        
     }
 }
