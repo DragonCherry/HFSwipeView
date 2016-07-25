@@ -685,11 +685,11 @@ extension HFSwipeView: UICollectionViewDataSource {
         indexViewMapper[displayIndex.row] = cellView
         
         if recycleEnabled {
-            dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
-        }
-        
-        if displayIndex.row == currentPage {
-            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
+            if displayIndex.row == currentPage {
+                dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
+            } else {
+                dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
+            }
         }
         
         // locate content view at center of given cell
@@ -719,13 +719,13 @@ extension HFSwipeView: UICollectionViewDataSource {
         indexViewMapper[indexPath.row] = cellView
         
         if recycleEnabled {
-            dataSource.swipeView?(self, needUpdateViewForIndexPath: indexPath, view: cellView!)
+            if indexPath.row == currentPage {
+                dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: indexPath, view: cellView!)
+            } else {
+                dataSource.swipeView?(self, needUpdateViewForIndexPath: indexPath, view: cellView!)
+            }
         }
         
-        if indexPath.row == currentPage {
-            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: indexPath, view: cellView!)
-        }
-
         // place view on cell
         if indexPath.row == 0 && count > 1 {
             cellView!.frame.origin.x = 0
