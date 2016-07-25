@@ -569,7 +569,7 @@ extension HFSwipeView {
                 return
         }
         let ratio = (posterOffset.x + (poster.width - posterItemSize.width) / 2) / posterSize.width
-        var newOffset = CGPoint(x: receiverSize.width * ratio - (self.width - receiverItemSize.width) / 2, y: receiverOffset.y)
+        let newOffset = CGPoint(x: receiverSize.width * ratio - (self.width - receiverItemSize.width) / 2, y: receiverOffset.y)
         setContentOffsetWithoutCallingDelegate(newOffset)
         updateIndexBasedOnContentOffset()
     }
