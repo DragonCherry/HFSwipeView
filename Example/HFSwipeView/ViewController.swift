@@ -164,6 +164,7 @@ extension ViewController: HFSwipeViewDataSource {
         if swipeView.tag == kMultiTag {
             currentMultiView?.setBorder(0.5, color: UIColor.blackColor())
             currentMultiView = view as? UILabel
+            currentMultiView?.text = "\(indexPath.row)"
             currentMultiView?.setBorder(2, color: UIColor.blueColor())
         } else {
             currentFullView?.setBorder(0.5, color: UIColor.blackColor())
