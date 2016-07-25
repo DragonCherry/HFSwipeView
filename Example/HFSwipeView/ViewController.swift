@@ -23,6 +23,9 @@ class ViewController: UIViewController {
     private let kMultiTag: Int = 100
     private let kFullTag: Int = 101
     
+    private var currentMultiView: UILabel?
+    private var currentFullView: UILabel?
+    
     // where multi swipe view will be placed
     private var multiItemSize: CGSize {
         return CGSize(width: self.view.width / 4, height: 50)
@@ -40,7 +43,7 @@ class ViewController: UIViewController {
             self.view.height - (multiViewRect.origin.y + multiViewRect.height))
     }
     private var fullItemSize: CGSize {
-        return CGSize(width: 335, height: fullViewRect.height)
+        return CGSize(width: self.view.width, height: fullViewRect.height)
     }
     
     private var swipeViewMulti: HFSwipeView? = nil
@@ -78,6 +81,9 @@ class ViewController: UIViewController {
         swipeViewFull!.setBorder(0.5, color: UIColor.blackColor())
         swipeViewFull!.backgroundColor = UIColor.clearColor()
         self.view.addSubview(self.swipeViewFull!)
+        
+        swipeViewMulti!.syncView = swipeViewFull
+        swipeViewFull!.syncView = swipeViewMulti
     }
     
     override func viewDidLayoutSubviews() {
@@ -86,8 +92,12 @@ class ViewController: UIViewController {
         self.swipeViewMulti!.frame = multiViewRect
     }
     
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
+    func colorForIndex(index: Int) -> UIColor {
+        return UIColor(
+            alpha: 1,
+            red: (((255 - 150) / sampleCount) * index + 150) % 256,
+            green: 200,
+            blue: (((255 - 150) / sampleCount) * index + 150) % 256)
     }
 }
 
@@ -134,8 +144,29 @@ extension ViewController: HFSwipeViewDataSource {
         if let label = view as? UILabel {
             label.text = "\(indexPath.row)"
             label.setBorder(0.5, color: UIColor.blackColor())
+            
+            switch swipeView.tag {
+//            case kMultiTag:
+//                
+            case kFullTag:
+                label.backgroundColor = colorForIndex(indexPath.row)
+            default:
+                break
+            }
         } else {
             assertionFailure("failed to retrieve button for index: \(indexPath.row)")
+        }
+    }
+    func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+        NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        if swipeView.tag == kMultiTag {
+            currentMultiView?.setBorder(0.5, color: UIColor.blackColor())
+            currentMultiView = view as? UILabel
+            currentMultiView?.setBorder(2, color: UIColor.blueColor())
+        } else {
+            currentFullView?.setBorder(0.5, color: UIColor.blackColor())
+            currentFullView = view as? UILabel
+            currentFullView?.setBorder(2, color: UIColor.blueColor())
         }
     }
 }
@@ -143,25 +174,15 @@ extension ViewController: HFSwipeViewDataSource {
 
 // MARK: - HFSwipeViewDelegate
 extension ViewController: HFSwipeViewDelegate {
-    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath, scrolledDirection: UIRectEdge) {
+    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
-        if swipeView.tag == kMultiTag {
-            swipeViewFull?.movePage(indexPath.row, animated: true, direction: scrolledDirection)
-        } else {
-            swipeViewMulti?.movePage(indexPath.row, animated: true, direction: scrolledDirection)
-        }
     }
     
-    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath, tappedDirection: UIRectEdge) {
+    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
-        if swipeView.tag == kMultiTag {
-            swipeViewFull?.movePage(indexPath.row, animated: true, direction: tappedDirection)
-        } else {
-            swipeViewMulti?.movePage(indexPath.row, animated: true, direction: tappedDirection)
-        }
     }
     
-    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath) {
+    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, changedView view: UIView) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
 }
