@@ -15,8 +15,12 @@ import HFUtility
     func swipeViewItemCount(swipeView: HFSwipeView) -> Int
     func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize
     func swipeView(swipeView: HFSwipeView, viewForIndexPath indexPath: NSIndexPath) -> UIView
+    /// This delegate method will invoked only in recycle mode.
     optional func swipeView(swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: NSIndexPath, view: UIView)
+    /// This delegate method will invoked only in recycle mode.
     optional func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView)
+    /// This delegate method will invoked only in circulation mode.
+    optional func swipeViewContentInsets(swipeView: HFSwipeView) -> UIEdgeInsets
     optional func swipeViewItemDistance(swipeView: HFSwipeView) -> CGFloat
 }
 
@@ -685,10 +689,9 @@ extension HFSwipeView: UICollectionViewDataSource {
         indexViewMapper[displayIndex.row] = cellView
         
         if recycleEnabled {
+            dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
             if displayIndex.row == currentPage {
                 dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
-            } else {
-                dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
             }
         }
         
@@ -782,6 +785,19 @@ extension HFSwipeView: UICollectionViewDelegateFlowLayout {
     }
     
     public func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
+        if !circulating {
+            if var insets = dataSource?.swipeViewContentInsets?(self) {
+                if insets.top != 0 {
+                    logw("Changing UIEdgeInsets.top for HFSwipeView is not supported yet, consider a container view instead.")
+                    insets.top = 0
+                }
+                if insets.bottom != 0 {
+                    logw("Changing UIEdgeInsets.bottom for HFSwipeView is not supported yet, consider a container view instead.")
+                    insets.bottom = 0
+                }
+                return insets
+            }
+        }
         return UIEdgeInsetsZero
     }
     
