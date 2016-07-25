@@ -23,7 +23,8 @@ class ViewController: UIViewController {
     private let kMultiTag: Int = 100
     private let kFullTag: Int = 101
     
-    private var currentItemView: UILabel?
+    private var currentMultiView: UILabel?
+    private var currentFullView: UILabel?
     
     // where multi swipe view will be placed
     private var multiItemSize: CGSize {
@@ -157,10 +158,15 @@ extension ViewController: HFSwipeViewDataSource {
         }
     }
     func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+        NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
         if swipeView.tag == kMultiTag {
-            currentItemView?.setBorder(0.5, color: UIColor.blackColor())
-            currentItemView = view as? UILabel
-            currentItemView?.setBorder(2, color: UIColor.redColor())
+            currentMultiView?.setBorder(0.5, color: UIColor.blackColor())
+            currentMultiView = view as? UILabel
+            currentMultiView?.setBorder(2, color: UIColor.blueColor())
+        } else {
+            currentFullView?.setBorder(0.5, color: UIColor.blackColor())
+            currentFullView = view as? UILabel
+            currentFullView?.setBorder(2, color: UIColor.blueColor())
         }
     }
 }
@@ -178,6 +184,5 @@ extension ViewController: HFSwipeViewDelegate {
     
     func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, changedView view: UIView) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
-        
     }
 }

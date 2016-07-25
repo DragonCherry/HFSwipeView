@@ -73,7 +73,6 @@ public class HFSwipeView: UIView {
     private var indexViewMapper = [Int: UIView]()
     
     // MARK: Loop Control Variables
-    private var notifyWhileScrolling: Bool = true
     private var dummyCount: Int = 0
     private var dummyWidth: CGFloat = 0
     private var realViewCount: Int = 0                          // real item count includes fake views on both side
@@ -315,7 +314,7 @@ extension HFSwipeView {
         prepareForInteraction()
     }
     
-    public func movePage(page: Int, animated: Bool, direction: UIRectEdge? = nil) {
+    public func movePage(page: Int, animated: Bool) {
         
         if page == currentPage {
             log("movePage received same page(\(page)) == currentPage(\(currentPage))")
@@ -343,7 +342,6 @@ extension HFSwipeView {
             return
         }
         log("\(#function)[\(self.tag)]: \(realPage)")
-        notifyWhileScrolling = false
         let realIndex = NSIndexPath(forItem: realPage, inSection: 0)
         let offset = centeredOffsetForIndex(realIndex)
         collectionView!.setContentOffset(offset, animated: animated)
@@ -582,10 +580,10 @@ extension HFSwipeView {
         
         if oldPage != currentPage {
             pageControl.currentPage = showingIndex.row
-            if notifyWhileScrolling {
+            delegate?.swipeView?(self, didChangeIndexPath: showingIndex)
+            if circulating {
                 if let view = indexViewMapper[currentPage] {
                     dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: showingIndex, view: view)
-                    delegate?.swipeView?(self, didChangeIndexPath: showingIndex)
                 } else {
                     loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(indexPath.row)")
                 }
@@ -733,7 +731,7 @@ extension HFSwipeView: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 extension HFSwipeView: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        self.delegate?.swipeView?(self, didSelectItemAtPath: showingIndexUsing(indexPath))
+        delegate?.swipeView?(self, didSelectItemAtPath: showingIndexUsing(indexPath))
         moveRealPage(indexPath.row, animated: true)
         updateIndex()
     }
@@ -831,7 +829,7 @@ extension HFSwipeView: UIScrollViewDelegate {
     
     public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
         log("\(#function)[\(self.tag)]")
-        notifyWhileScrolling = true
+        updateIndex()
     }
     
     private func finishScrolling() {
@@ -840,8 +838,6 @@ extension HFSwipeView: UIScrollViewDelegate {
             return
         }
         log("\(#function)[\(self.tag)]: real -> \(indexPath.row)")
-        
-        notifyWhileScrolling = true
         
         let showingIndex = showingIndexUsing(indexPath)
         delegate?.swipeView?(self, didFinishScrollAtIndexPath: showingIndex)
