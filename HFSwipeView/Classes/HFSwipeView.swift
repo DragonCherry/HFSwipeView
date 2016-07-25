@@ -321,8 +321,8 @@ extension HFSwipeView {
             autoAlign(collectionView!, indexPath: NSIndexPath(forItem: currentRealPage, inSection: 0))
             return
         }
-        let showingIndex = NSIndexPath(forItem: page, inSection: 0)
-        let realIndex = closestIndexTo(showingIndex)
+        let displayIndex = NSIndexPath(forItem: page, inSection: 0)
+        let realIndex = closestIndexTo(displayIndex)
         moveRealPage(realIndex.row, animated: animated)
     }
     
@@ -345,12 +345,27 @@ extension HFSwipeView {
         let realIndex = NSIndexPath(forItem: realPage, inSection: 0)
         let offset = centeredOffsetForIndex(realIndex)
         collectionView!.setContentOffset(offset, animated: animated)
+        
+        if !circulating {
+            updateCurrentView(displayIndexUsing(realIndex))
+        }
     }
     
-    private func closestIndexTo(showingIndex: NSIndexPath) -> NSIndexPath {
+    private func updateCurrentView(displayIndex: NSIndexPath) {
+        currentPage = displayIndex.row
+        currentRealPage = displayIndex.row
+        if let view = indexViewMapper[currentPage] {
+            dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: view)
+        } else {
+            loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(displayIndex.row)")
+        }
+        
+    }
+    
+    private func closestIndexTo(displayIndex: NSIndexPath) -> NSIndexPath {
         
         let from = currentRealPage
-        let dest = showingIndex.row
+        let dest = displayIndex.row
         var minDiff: Int = count + dummyCount * 2
         var minIdx: Int = -1
         var index = count - dummyCount
@@ -476,53 +491,53 @@ extension HFSwipeView {
         return index
     }
     
-    private func showingIndexUsing(realIndex: NSIndexPath) -> NSIndexPath {
+    private func displayIndexUsing(realIndex: NSIndexPath) -> NSIndexPath {
         if circulating {
-            var showingIndex = 0
+            var displayIndex = 0
             if realIndex.row < dummyCount {
-                showingIndex = realIndex.row - dummyCount + count
+                displayIndex = realIndex.row - dummyCount + count
             } else if realIndex.row < count + dummyCount {
-                showingIndex = realIndex.row - dummyCount
+                displayIndex = realIndex.row - dummyCount
             } else {
-                showingIndex = realIndex.row - count - dummyCount
+                displayIndex = realIndex.row - count - dummyCount
             }
-            //            log("\(#function)[\(self.tag)]: \(realIndex.row) -> \(showingIndex)")
-            return NSIndexPath(forItem: showingIndex, inSection: 0)
+            //            log("\(#function)[\(self.tag)]: \(realIndex.row) -> \(displayIndex)")
+            return NSIndexPath(forItem: displayIndex, inSection: 0)
         } else {
             return NSIndexPath(forItem: realIndex.row, inSection: 0)
         }
     }
     
-    private func realIndexUsing(showingIndex: NSIndexPath) -> NSIndexPath {
+    private func realIndexUsing(displayIndex: NSIndexPath) -> NSIndexPath {
         if !circulating {
-            return showingIndex
+            return displayIndex
         }
         var index: Int = 0
-        if 0 <= showingIndex.row && showingIndex.row < count {
-            index = showingIndex.row + dummyCount
+        if 0 <= displayIndex.row && displayIndex.row < count {
+            index = displayIndex.row + dummyCount
         }
-        log("\(#function)[\(self.tag)]: \(showingIndex.row) -> \(index)")
+        log("\(#function)[\(self.tag)]: \(displayIndex.row) -> \(index)")
         return NSIndexPath(forItem: index, inSection: 0)
     }
     
-    private func realIndexesUsing(showingIndex: NSIndexPath) -> [NSIndexPath] {
+    private func realIndexesUsing(displayIndex: NSIndexPath) -> [NSIndexPath] {
         if !circulating {
-            return [showingIndex]
+            return [displayIndex]
         }
         var realIndexes = [NSIndexPath]()
         
         let cut = count - dummyCount
         
         // index on dummy(head) area
-        if showingIndex.row - cut >= 0 {
-            realIndexes.append(NSIndexPath(forItem: showingIndex.row - cut, inSection: 0))
+        if displayIndex.row - cut >= 0 {
+            realIndexes.append(NSIndexPath(forItem: displayIndex.row - cut, inSection: 0))
         }
         // index on center area
-        realIndexes.append(NSIndexPath(forItem: dummyCount + showingIndex.row, inSection: 0))
+        realIndexes.append(NSIndexPath(forItem: dummyCount + displayIndex.row, inSection: 0))
         
         // index on dummy(tail) area
-        if dummyCount + count + showingIndex.row < realViewCount {
-            realIndexes.append(NSIndexPath(forItem: dummyCount + count + showingIndex.row, inSection: 0))
+        if dummyCount + count + displayIndex.row < realViewCount {
+            realIndexes.append(NSIndexPath(forItem: dummyCount + count + displayIndex.row, inSection: 0))
         }
         
         return realIndexes
@@ -556,7 +571,7 @@ extension HFSwipeView {
         let ratio = (posterOffset.x + (poster.width - posterItemSize.width) / 2) / posterSize.width
         var newOffset = CGPoint(x: receiverSize.width * ratio - (self.width - receiverItemSize.width) / 2, y: receiverOffset.y)
         setContentOffsetWithoutCallingDelegate(newOffset)
-        updateIndex()
+        updateIndexBasedOnContentOffset()
     }
     
     private func setContentOffsetWithoutCallingDelegate(offset: CGPoint) {
@@ -565,28 +580,30 @@ extension HFSwipeView {
         collectionView!.delegate = self
     }
     
-    private func updateIndex() {
+    private func updateIndexBasedOnContentOffset() {
+        
+        if !circulating {
+            return
+        }
         
         guard let indexPath = indexPathForItemAtPoint(collectionView!.contentOffset) else {
             logw("indexPathForItemAtPoint returned nil.")
             return
         }
         
-        let showingIndex = showingIndexUsing(indexPath)
+        let displayIndex = displayIndexUsing(indexPath)
         let oldPage = currentPage
         
-        currentPage = showingIndex.row
+        currentPage = displayIndex.row
         currentRealPage = indexPath.row
         
         if oldPage != currentPage {
-            pageControl.currentPage = showingIndex.row
-            delegate?.swipeView?(self, didChangeIndexPath: showingIndex)
-            if circulating {
-                if let view = indexViewMapper[currentPage] {
-                    dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: showingIndex, view: view)
-                } else {
-                    loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(indexPath.row)")
-                }
+            pageControl.currentPage = displayIndex.row
+            delegate?.swipeView?(self, didChangeIndexPath: displayIndex)
+            if let view = indexViewMapper[currentPage] {
+                dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: view)
+            } else {
+                loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(indexPath.row)")
             }
             log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
         }
@@ -653,7 +670,7 @@ extension HFSwipeView: UICollectionViewDataSource {
             return cell
         }
         
-        let showingIndex: NSIndexPath = showingIndexUsing(indexPath)
+        let displayIndex: NSIndexPath = displayIndexUsing(indexPath)
         var cellView: UIView? = nil
         
         if recycleEnabled {
@@ -662,17 +679,17 @@ extension HFSwipeView: UICollectionViewDataSource {
         }
         if cellView == nil {
             // set cellView as newly created view
-            cellView = dataSource.swipeView(self, viewForIndexPath: showingIndex)
+            cellView = dataSource.swipeView(self, viewForIndexPath: displayIndex)
             cellView!.tag = kSwipeViewCellContentTag
         }
-        indexViewMapper[showingIndex.row] = cellView
+        indexViewMapper[displayIndex.row] = cellView
         
         if recycleEnabled {
-            dataSource.swipeView?(self, needUpdateViewForIndexPath: showingIndex, view: cellView!)
+            dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
         }
         
-        if showingIndex.row == currentPage {
-            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: showingIndex, view: cellView!)
+        if displayIndex.row == currentPage {
+            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
         }
         
         // locate content view at center of given cell
@@ -699,6 +716,7 @@ extension HFSwipeView: UICollectionViewDataSource {
             cellView = dataSource.swipeView(self, viewForIndexPath: indexPath)
             cellView!.tag = kSwipeViewCellContentTag
         }
+        indexViewMapper[indexPath.row] = cellView
         
         if recycleEnabled {
             dataSource.swipeView?(self, needUpdateViewForIndexPath: indexPath, view: cellView!)
@@ -731,9 +749,8 @@ extension HFSwipeView: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 extension HFSwipeView: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        delegate?.swipeView?(self, didSelectItemAtPath: showingIndexUsing(indexPath))
+        delegate?.swipeView?(self, didSelectItemAtPath: displayIndexUsing(indexPath))
         moveRealPage(indexPath.row, animated: true)
-        updateIndex()
     }
 }
 
@@ -805,7 +822,7 @@ extension HFSwipeView: UIScrollViewDelegate {
             postSync(scrollView.contentOffset, contentSize: scrollView.contentSize)
         }
         
-        updateIndex()
+        updateIndexBasedOnContentOffset()
     }
     
     public func scrollViewWillBeginDecelerating(scrollView: UIScrollView) {
@@ -829,7 +846,7 @@ extension HFSwipeView: UIScrollViewDelegate {
     
     public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
         log("\(#function)[\(self.tag)]")
-        updateIndex()
+        updateIndexBasedOnContentOffset()
     }
     
     private func finishScrolling() {
@@ -839,8 +856,8 @@ extension HFSwipeView: UIScrollViewDelegate {
         }
         log("\(#function)[\(self.tag)]: real -> \(indexPath.row)")
         
-        let showingIndex = showingIndexUsing(indexPath)
-        delegate?.swipeView?(self, didFinishScrollAtIndexPath: showingIndex)
+        let displayIndex = displayIndexUsing(indexPath)
+        delegate?.swipeView?(self, didFinishScrollAtIndexPath: displayIndex)
         
         if circulating {
             if !scrollViewFixOffset(collectionView!) {
