@@ -28,7 +28,7 @@ class ViewController: UIViewController {
     
     // where multi swipe view will be placed
     private var multiItemSize: CGSize {
-        return CGSize(width: self.view.width / 4, height: 50)
+        return CGSize(width: 93.75, height: 50)
     }
     private var multiViewRect: CGRect {
         return CGRectMake(0, 20, self.view.width, 50)
@@ -82,12 +82,12 @@ class ViewController: UIViewController {
         swipeViewFull!.backgroundColor = UIColor.clearColor()
         self.view.addSubview(self.swipeViewFull!)
         
-        if swipeViewMulti!.circulating && swipeViewFull!.circulating {
-            swipeViewMulti!.syncView = swipeViewFull
-            swipeViewFull!.syncView = swipeViewMulti
-        }
+//        if swipeViewMulti!.circulating && swipeViewFull!.circulating {
+//            swipeViewMulti!.syncView = swipeViewFull
+//            swipeViewFull!.syncView = swipeViewMulti
+//        }
         
-        swipeViewMulti!.startAutoSlideForTimeInterval(1.5)
+//        swipeViewMulti!.startAutoSlideForTimeInterval(1.5)
     }
     
     override func viewDidLayoutSubviews() {

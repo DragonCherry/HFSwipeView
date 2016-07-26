@@ -289,6 +289,9 @@ extension HFSwipeView {
         
         initialized = false
         
+        // force recycle mode in circulation mode
+        recycleEnabled = circulating ? true : recycleEnabled
+        
         // calculate for view presentation
         if calculate() {
             if let itemSize = self.itemSize {
@@ -746,6 +749,7 @@ extension HFSwipeView: UICollectionViewDataSource {
     }
     
     private func cellForItemInCirculationMode(collectionView: UICollectionView, indexPath: NSIndexPath) -> UICollectionViewCell {
+        
         let cell: UICollectionViewCell = collectionView.dequeueReusableCellWithReuseIdentifier(kSwipeViewCellIdentifier, forIndexPath: indexPath)
         guard let dataSource = self.dataSource else {
             loge("dataSource is nil")
@@ -766,11 +770,10 @@ extension HFSwipeView: UICollectionViewDataSource {
         }
         indexViewMapper[displayIndex.row] = cellView
         
-        if recycleEnabled {
+        if displayIndex.row == currentPage {
+            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
+        } else {
             dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
-            if displayIndex.row == currentPage {
-                dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
-            }
         }
         
         // locate content view at center of given cell
