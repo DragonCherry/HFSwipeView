@@ -59,7 +59,7 @@ class ViewController: UIViewController {
         
         swipeViewMulti = HFSwipeView(frame: multiViewRect)
         swipeViewMulti!.autoAlignEnabled = true
-        swipeViewMulti!.circulating = false
+        swipeViewMulti!.circulating = true
         swipeViewMulti!.dataSource = self
         swipeViewMulti!.delegate = self
         swipeViewMulti!.tag = kMultiTag
@@ -71,7 +71,7 @@ class ViewController: UIViewController {
         
         swipeViewFull = HFSwipeView(frame: fullViewRect)
         swipeViewFull!.autoAlignEnabled = true
-        swipeViewFull!.circulating = false
+        swipeViewFull!.circulating = true
         swipeViewFull!.dataSource = self
         swipeViewFull!.delegate = self
         swipeViewFull!.tag = kFullTag
@@ -86,6 +86,8 @@ class ViewController: UIViewController {
             swipeViewMulti!.syncView = swipeViewFull
             swipeViewFull!.syncView = swipeViewMulti
         }
+        
+        swipeViewMulti!.startAutoSlideForTimeInterval(1.5)
     }
     
     override func viewDidLayoutSubviews() {

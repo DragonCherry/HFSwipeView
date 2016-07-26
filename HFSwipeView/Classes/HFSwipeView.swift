@@ -82,6 +82,11 @@ public class HFSwipeView: UIView {
     private var realViewCount: Int = 0                          // real item count includes fake views on both side
     private var currentRealPage: Int = -1
     
+    // MARK: Auto Slide
+    private var autoSlideInterval: NSTimeInterval = -1
+    private var autoSlideIntervalBackupForLaterUse: NSTimeInterval = -1
+    private var autoSlideTimer: NSTimer?
+    
     // MARK: Sync View
     public var syncView: HFSwipeView?
     
@@ -337,84 +342,75 @@ extension HFSwipeView {
 
 
 
-// MARK: - Private Methods
+// MARK: - Public APIs: Auto Slide
 extension HFSwipeView {
-    
-    private func moveRealPage(realPage: Int, animated: Bool) {
-        if realPage == currentRealPage {
-            log("moveRealPage received same page(\(realPage)) == currentPage(\(currentRealPage))")
+    /// zero or minus interval disables auto slide.
+    public func startAutoSlideForTimeInterval(interval: NSTimeInterval) {
+        log("\(#function)")
+        if !circulating {
+            logw("Cannot use auto-slide without circulation mode.")
             return
         }
-        log("\(#function)[\(self.tag)]: \(realPage)")
-        let realIndex = NSIndexPath(forItem: realPage, inSection: 0)
-        let offset = centeredOffsetForIndex(realIndex)
-        collectionView!.setContentOffset(offset, animated: animated)
-        
+        if interval > 0 {
+            stopAutoSlide()
+            autoSlideInterval = interval
+            autoSlideTimer = NSTimer.scheduledTimerWithTimeInterval(
+                interval,
+                target: self,
+                selector: #selector(HFSwipeView.autoSlideCallback(_:)),
+                userInfo: nil,
+                repeats: true)
+        }
+    }
+    
+    public func pauseAutoSlide() {
+        log("\(#function)")
         if !circulating {
-            updateCurrentView(displayIndexUsing(realIndex))
+            logw("Cannot use auto-slide without circulation mode.")
+            return
+        }
+        if autoSlideInterval > 0 {
+            autoSlideIntervalBackupForLaterUse = autoSlideInterval
+        }
+        autoSlideInterval = -1
+        autoSlideTimer?.invalidate()
+        autoSlideTimer = nil
+    }
+    
+    public func resumeAutoSlide() {
+        log("\(#function)")
+        if !circulating {
+            logw("Cannot use auto-slide without circulation mode.")
+            return
+        }
+        if autoSlideIntervalBackupForLaterUse > 0 {
+            startAutoSlideForTimeInterval(autoSlideIntervalBackupForLaterUse)
         }
     }
     
-    private func updateCurrentView(displayIndex: NSIndexPath) {
-        currentPage = displayIndex.row
-        currentRealPage = displayIndex.row
-        if let view = indexViewMapper[currentPage] {
-            dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: view)
-        } else {
-            loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(displayIndex.row)")
+    public func stopAutoSlide() {
+        log("\(#function)")
+        if !circulating {
+            logw("Cannot use auto-slide without circulation mode.")
+            return
         }
-        
+        autoSlideInterval = -1
+        autoSlideIntervalBackupForLaterUse = -1
+        autoSlideTimer?.invalidate()
+        autoSlideTimer = nil
     }
     
-    private func closestIndexTo(displayIndex: NSIndexPath) -> NSIndexPath {
-        
-        let from = currentRealPage
-        let dest = displayIndex.row
-        var minDiff: Int = count + dummyCount * 2
-        var minIdx: Int = -1
-        var index = count - dummyCount
-        
-        // traverse header
-        for i in 0..<dummyCount {
-            if dest == index {
-                let newDiff = from > i ? from - i : i - from
-                if newDiff < minDiff {
-                    minDiff = newDiff
-                    minIdx = i
-                }
-            }
-            index += 1
+    public func autoSlideCallback(timer: NSTimer) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.movePage((self.currentPage + 1) % self.count, animated: true)
         }
-        index = 0
-        
-        // traverse body
-        for i in dummyCount..<(dummyCount + count) {
-            if dest == index {
-                let newDiff = from > i ? from - i : i - from
-                if newDiff < minDiff {
-                    minDiff = newDiff
-                    minIdx = i
-                }
-            }
-            index += 1
-        }
-        index = 0
-        
-        // traverse tail
-        for i in (dummyCount + count)..<(count + dummyCount * 2) {
-            if dest == index {
-                let newDiff = from > i ? from - i : i - from
-                if newDiff < minDiff {
-                    minDiff = newDiff
-                    minIdx = i
-                }
-            }
-            index += 1
-        }
-        log("\(#function)[\(self.tag)]: from: \(from) to: \(minIdx)")
-        return NSIndexPath(forItem: minIdx, inSection: 0)
     }
-    
+}
+
+
+
+// MARK: - Private Methods: Offset Control
+extension HFSwipeView {
     private func centerOffset() -> CGPoint {
         var center = self.collectionView!.contentOffset
         center.x += self.width / 2
@@ -474,6 +470,112 @@ extension HFSwipeView {
                 return centeredOffset
             }
         }
+    }
+    
+    private func setContentOffsetWithoutCallingDelegate(offset: CGPoint) {
+        collectionView!.delegate = nil
+        collectionView!.contentOffset = offset
+        collectionView!.delegate = self
+    }
+    
+    private func updateIndexBasedOnContentOffset() {
+        
+        if !circulating {
+            return
+        }
+        
+        guard let indexPath = indexPathForItemAtPoint(collectionView!.contentOffset) else {
+            logw("indexPathForItemAtPoint returned nil.")
+            return
+        }
+        
+        let displayIndex = displayIndexUsing(indexPath)
+        let oldPage = currentPage
+        
+        currentPage = displayIndex.row
+        currentRealPage = indexPath.row
+        
+        if oldPage != currentPage {
+            pageControl.currentPage = displayIndex.row
+            delegate?.swipeView?(self, didChangeIndexPath: displayIndex)
+            if let view = indexViewMapper[currentPage] {
+                dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: view)
+            } else {
+                loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(indexPath.row)")
+            }
+            log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
+        }
+    }
+    
+    private func scrollViewFixOffset(scrollView: UIScrollView) -> Bool {
+        let offset = scrollView.contentOffset
+        let contentSize = scrollView.contentSize
+        if offset.x < dummyWidth {
+            let delta = dummyWidth - offset.x
+            setContentOffsetWithoutCallingDelegate(CGPoint(x: contentSize.width - dummyWidth - delta, y: 0))
+            log("\(#function)[\(self.tag)]: moved to last view, offset: \(scrollView.contentOffset)")
+            return true
+        } else if offset.x >= contentSize.width - dummyWidth {
+            let delta = offset.x - (contentSize.width - dummyWidth)
+            setContentOffsetWithoutCallingDelegate(CGPoint(x: self.dummyWidth + delta, y: 0))
+            log("\(#function)[\(self.tag)]: moved to first view!, offset: \(scrollView.contentOffset)")
+            return true
+        }
+        return false
+    }
+}
+
+
+
+// MARK: - Private Methods: Index Control
+extension HFSwipeView {
+    private func closestIndexTo(displayIndex: NSIndexPath) -> NSIndexPath {
+        
+        let from = currentRealPage
+        let dest = displayIndex.row
+        var minDiff: Int = count + dummyCount * 2
+        var minIdx: Int = -1
+        var index = count - dummyCount
+        
+        // traverse header
+        for i in 0..<dummyCount {
+            if dest == index {
+                let newDiff = from > i ? from - i : i - from
+                if newDiff < minDiff {
+                    minDiff = newDiff
+                    minIdx = i
+                }
+            }
+            index += 1
+        }
+        index = 0
+        
+        // traverse body
+        for i in dummyCount..<(dummyCount + count) {
+            if dest == index {
+                let newDiff = from > i ? from - i : i - from
+                if newDiff < minDiff {
+                    minDiff = newDiff
+                    minIdx = i
+                }
+            }
+            index += 1
+        }
+        index = 0
+        
+        // traverse tail
+        for i in (dummyCount + count)..<(count + dummyCount * 2) {
+            if dest == index {
+                let newDiff = from > i ? from - i : i - from
+                if newDiff < minDiff {
+                    minDiff = newDiff
+                    minIdx = i
+                }
+            }
+            index += 1
+        }
+        log("\(#function)[\(self.tag)]: from: \(from) to: \(minIdx)")
+        return NSIndexPath(forItem: minIdx, inSection: 0)
     }
     
     private func indexPathForItemAtPoint(offset: CGPoint) -> NSIndexPath? {
@@ -546,16 +648,44 @@ extension HFSwipeView {
         
         return realIndexes
     }
+}
+
+// MARK: - Private Methods: Page Control
+extension HFSwipeView {
+    
+    private func moveRealPage(realPage: Int, animated: Bool) {
+        if realPage == currentRealPage {
+            log("moveRealPage received same page(\(realPage)) == currentPage(\(currentRealPage))")
+            return
+        }
+        log("\(#function)[\(self.tag)]: \(realPage)")
+        let realIndex = NSIndexPath(forItem: realPage, inSection: 0)
+        let offset = centeredOffsetForIndex(realIndex)
+        collectionView!.setContentOffset(offset, animated: animated)
+        
+        if !circulating {
+            updateCurrentView(displayIndexUsing(realIndex))
+        }
+    }
+    
+    private func updateCurrentView(displayIndex: NSIndexPath) {
+        currentPage = displayIndex.row
+        currentRealPage = displayIndex.row
+        if let view = indexViewMapper[currentPage] {
+            dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: view)
+        } else {
+            loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(displayIndex.row)")
+        }
+        
+    }
     
     private func postSync(contentOffset: CGPoint, contentSize: CGSize) {
         if let syncView = self.syncView {
-            //            log("\(#function)[\(self.tag)]")
             syncView.notifiedSync(self)
         }
     }
     
     private func notifiedSync(poster: HFSwipeView) {
-        //        log("\(#function)[\(self.tag)]")
         guard
             let posterItemSize = poster.itemSize,
             let posterOffset = poster.collectionView?.contentOffset,
@@ -578,41 +708,6 @@ extension HFSwipeView {
         updateIndexBasedOnContentOffset()
     }
     
-    private func setContentOffsetWithoutCallingDelegate(offset: CGPoint) {
-        collectionView!.delegate = nil
-        collectionView!.contentOffset = offset
-        collectionView!.delegate = self
-    }
-    
-    private func updateIndexBasedOnContentOffset() {
-        
-        if !circulating {
-            return
-        }
-        
-        guard let indexPath = indexPathForItemAtPoint(collectionView!.contentOffset) else {
-            logw("indexPathForItemAtPoint returned nil.")
-            return
-        }
-        
-        let displayIndex = displayIndexUsing(indexPath)
-        let oldPage = currentPage
-        
-        currentPage = displayIndex.row
-        currentRealPage = indexPath.row
-        
-        if oldPage != currentPage {
-            pageControl.currentPage = displayIndex.row
-            delegate?.swipeView?(self, didChangeIndexPath: displayIndex)
-            if let view = indexViewMapper[currentPage] {
-                dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: view)
-            } else {
-                loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(indexPath.row)")
-            }
-            log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
-        }
-    }
-    
     private func autoAlign(scrollView: UIScrollView, indexPath: NSIndexPath) {
         if autoAlignEnabled {
             if !circulating {
@@ -625,23 +720,6 @@ extension HFSwipeView {
             }
         }
         log("\(#function)[\(self.tag)]: real -> \(indexPath.row)")
-    }
-    
-    private func scrollViewFixOffset(scrollView: UIScrollView) -> Bool {
-        let offset = scrollView.contentOffset
-        let contentSize = scrollView.contentSize
-        if offset.x < dummyWidth {
-            let delta = dummyWidth - offset.x
-            setContentOffsetWithoutCallingDelegate(CGPoint(x: contentSize.width - dummyWidth - delta, y: 0))
-            log("\(#function)[\(self.tag)]: moved to last view, offset: \(scrollView.contentOffset)")
-            return true
-        } else if offset.x >= contentSize.width - dummyWidth {
-            let delta = offset.x - (contentSize.width - dummyWidth)
-            setContentOffsetWithoutCallingDelegate(CGPoint(x: self.dummyWidth + delta, y: 0))
-            log("\(#function)[\(self.tag)]: moved to first view!, offset: \(scrollView.contentOffset)")
-            return true
-        }
-        return false
     }
 }
 
@@ -752,6 +830,9 @@ extension HFSwipeView: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 extension HFSwipeView: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        if circulating {
+            pauseAutoSlide()
+        }
         delegate?.swipeView?(self, didSelectItemAtPath: displayIndexUsing(indexPath))
         moveRealPage(indexPath.row, animated: true)
     }
@@ -822,6 +903,9 @@ extension HFSwipeView: UICollectionViewDelegateFlowLayout {
 extension HFSwipeView: UIScrollViewDelegate {
     
     public func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        if circulating {
+            pauseAutoSlide()
+        }
         delegate?.swipeViewWillBeginDragging?(self)
     }
     
@@ -863,6 +947,10 @@ extension HFSwipeView: UIScrollViewDelegate {
     public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
         log("\(#function)[\(self.tag)]")
         updateIndexBasedOnContentOffset()
+        
+        if circulating {
+            resumeAutoSlide()
+        }
     }
     
     private func finishScrolling() {
@@ -881,6 +969,10 @@ extension HFSwipeView: UIScrollViewDelegate {
             }
         } else {
             autoAlign(collectionView!, indexPath: indexPath)
+        }
+        
+        if circulating {
+            resumeAutoSlide()
         }
     }
 }
