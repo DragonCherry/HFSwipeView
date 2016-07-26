@@ -345,7 +345,7 @@ extension HFSwipeView {
 // MARK: - Public APIs: Auto Slide
 extension HFSwipeView {
     /// zero or minus interval disables auto slide.
-    public func setAutoSlideForTimeInterval(interval: NSTimeInterval) {
+    public func startAutoSlideForTimeInterval(interval: NSTimeInterval) {
         log("\(#function)")
         if !circulating {
             logw("Cannot use auto-slide without circulation mode.")
@@ -384,7 +384,7 @@ extension HFSwipeView {
             return
         }
         if autoSlideIntervalBackupForLaterUse > 0 {
-            setAutoSlideForTimeInterval(autoSlideIntervalBackupForLaterUse)
+            startAutoSlideForTimeInterval(autoSlideIntervalBackupForLaterUse)
         }
     }
     

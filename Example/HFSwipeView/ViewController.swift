@@ -87,7 +87,7 @@ class ViewController: UIViewController {
             swipeViewFull!.syncView = swipeViewMulti
         }
         
-        swipeViewMulti!.setAutoSlideForTimeInterval(1.5)
+        swipeViewMulti!.startAutoSlideForTimeInterval(1.5)
     }
     
     override func viewDidLayoutSubviews() {
