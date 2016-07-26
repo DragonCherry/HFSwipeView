@@ -82,6 +82,10 @@ public class HFSwipeView: UIView {
     private var realViewCount: Int = 0                          // real item count includes fake views on both side
     private var currentRealPage: Int = -1
     
+    // MARK: Auto Slide
+    private var autoSlideInterval: NSTimeInterval = -1
+    private var timer: NSTimer?
+    
     // MARK: Sync View
     public var syncView: HFSwipeView?
     
@@ -332,6 +336,30 @@ extension HFSwipeView {
     
     public func deselectItemAtPath(indexPath: NSIndexPath, animated: Bool) {
         self.collectionView?.deselectItemAtIndexPath(indexPath, animated: animated)
+    }
+    
+    /// zero or minus interval disables auto slide.
+    public func setAutoSlideForTimeInterval(interval: NSTimeInterval) {
+        if interval > 0 {
+            self.autoSlideInterval = interval
+            self.timer = NSTimer.scheduledTimerWithTimeInterval(
+                interval,
+                target: self,
+                selector: #selector(HFSwipeView.autoSlideCallback(_:)),
+                userInfo: nil,
+                repeats: true)
+        } else {
+            self.autoSlideInterval = -1
+            self.timer?.invalidate()
+            self.timer = nil
+        }
+        
+    }
+    
+    public func autoSlideCallback(timer: NSTimer) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.movePage((self.currentPage + 1) % self.count, animated: true)
+        }
     }
 }
 
