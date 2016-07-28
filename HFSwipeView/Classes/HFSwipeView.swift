@@ -120,6 +120,9 @@ public class HFSwipeView: UIView {
         }
     }
     
+    public var magnifyCenter: Bool = false
+    public var preferredMagnifyBonusRatio: CGFloat = 1
+    
     public var autoAlignEnabled: Bool = false
     
     /**
@@ -288,6 +291,9 @@ extension HFSwipeView {
         log("\(#function)")
         
         initialized = false
+        
+        // force recycle mode in circulation mode
+        recycleEnabled = circulating ? true : recycleEnabled
         
         // calculate for view presentation
         if calculate() {
@@ -724,6 +730,88 @@ extension HFSwipeView {
 }
 
 
+// MARK: - Magnify
+extension HFSwipeView {
+    private func applyMagnifyCenter(forCell cell: UICollectionViewCell) {
+        if !magnifyCenter {
+            return
+        }
+        
+        let left = self.collectionView!.contentOffset.x + itemSize!.width / 2
+        let right = self.collectionView!.contentOffset.x + width - itemSize!.width / 2
+        let center = centerOffset().x
+        let ratio = centerRatio(left, right: right, center: center, cell: cell)
+        
+        magnifyCell(cell, forRatio: ratio)
+    }
+    
+    private func applyMagnifyCenter() {
+        if !magnifyCenter {
+            return
+        }
+        let cells = collectionView!.visibleCells()
+        var cellsText = ""
+        
+        let left = self.collectionView!.contentOffset.x + itemSize!.width / 2
+        let right = self.collectionView!.contentOffset.x + width - itemSize!.width / 2
+        let center = centerOffset().x
+        
+        for cell in cells {
+            let ratio = centerRatio(left, right: right, center: center, cell: cell)
+            cellsText += "(\(cell.tag):\(ratio)) "
+            magnifyCell(cell, forRatio: ratio)
+        }
+        log("\(#function): \(cellsText)")
+    }
+    
+    private func magnifyCell(cell: UICollectionViewCell, forRatio ratio: CGFloat) {
+        
+        if let cellView = cell.contentView.viewWithTag(kSwipeViewCellContentTag) {
+            var bonusRatio: CGFloat = preferredMagnifyBonusRatio
+            let cellWidth = itemSize!.width + itemSpace
+            if cellView.width * bonusRatio > cellWidth {
+                bonusRatio = cellWidth / itemSize!.width
+            }
+            
+            // resizeRatio by center-ratio
+            if ratio >= 0 {
+                bonusRatio = (ratio - 1) * (bonusRatio - 1) * -1 + 1
+            } else {
+                bonusRatio = (ratio + 1) * (bonusRatio - 1) + 1
+            }
+            log("bonusRatio: \(bonusRatio)")
+            
+            let viewWidth = itemSize!.width * bonusRatio
+            cellView.transform = CGAffineTransformMakeScale(bonusRatio, bonusRatio)
+            let space = (cellWidth - viewWidth) / 2
+            cellView.frame.origin = CGPointMake(space + space * ratio, cellView.y)
+        }
+    }
+    
+    private func centerRatio(left: CGFloat, right: CGFloat, center: CGFloat, cell: UICollectionViewCell) -> CGFloat {
+        
+        var ratio: CGFloat = 0
+        let divider = center - left
+        if cell.center.x < center {
+            ratio = (center - cell.center.x) / divider * -1
+            if ratio < -1 {
+                ratio = -1
+            }
+        } else if cell.center.x > center {
+            ratio = (cell.center.x - center) / divider
+            if ratio > 1 {
+                ratio = 1
+            }
+        } else {
+            ratio = 0
+        }
+        
+        return ratio
+    }
+}
+
+
+
 // MARK: - UICollectionViewDataSource
 extension HFSwipeView: UICollectionViewDataSource {
     
@@ -746,6 +834,7 @@ extension HFSwipeView: UICollectionViewDataSource {
     }
     
     private func cellForItemInCirculationMode(collectionView: UICollectionView, indexPath: NSIndexPath) -> UICollectionViewCell {
+        
         let cell: UICollectionViewCell = collectionView.dequeueReusableCellWithReuseIdentifier(kSwipeViewCellIdentifier, forIndexPath: indexPath)
         guard let dataSource = self.dataSource else {
             loge("dataSource is nil")
@@ -766,16 +855,21 @@ extension HFSwipeView: UICollectionViewDataSource {
         }
         indexViewMapper[displayIndex.row] = cellView
         
-        if recycleEnabled {
+        if displayIndex.row == currentPage {
+            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
+        } else {
             dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
-            if displayIndex.row == currentPage {
-                dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
-            }
         }
         
         // locate content view at center of given cell
         cellView!.frame.origin.x = itemSpace / 2
         cell.contentView.addSubview(cellView!)
+        
+        if magnifyCenter {
+            cell.tag = indexPath.row
+            applyMagnifyCenter(forCell: cell)
+        }
+        log("\(#function): \(indexPath.row) - \(cell.x)")
         return cell
     }
     
@@ -902,6 +996,8 @@ extension HFSwipeView: UICollectionViewDelegateFlowLayout {
 // MARK: - UIScrollViewDelegate
 extension HFSwipeView: UIScrollViewDelegate {
     
+    
+    
     public func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         if circulating {
             pauseAutoSlide()
@@ -923,6 +1019,7 @@ extension HFSwipeView: UIScrollViewDelegate {
         }
         
         updateIndexBasedOnContentOffset()
+        applyMagnifyCenter()
     }
     
     public func scrollViewWillBeginDecelerating(scrollView: UIScrollView) {
