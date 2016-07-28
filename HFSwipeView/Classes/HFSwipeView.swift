@@ -318,12 +318,7 @@ extension HFSwipeView {
         pageControl.numberOfPages = count
         
         if count > 0 {
-            if currentPage < 0 {
-                currentPage = 0
-                currentRealPage = dummyCount
-            }
-            collectionView!.reloadSections(NSIndexSet(index: 0))
-            let offset = centeredOffsetForIndex(NSIndexPath(forItem: currentRealPage, inSection: 0))
+            let offset = centeredOffsetForIndex(NSIndexPath(forItem: currentRealPage < 0 ? dummyCount : currentRealPage, inSection: 0))
             collectionView!.setContentOffset(offset, animated: false)
         }
         prepareForInteraction()
@@ -869,7 +864,7 @@ extension HFSwipeView: UICollectionViewDataSource {
             cell.tag = indexPath.row
             applyMagnifyCenter(forCell: cell)
         }
-        log("\(#function): \(indexPath.row) - \(cell.x)")
+        updateIndexBasedOnContentOffset()
         return cell
     }
     
