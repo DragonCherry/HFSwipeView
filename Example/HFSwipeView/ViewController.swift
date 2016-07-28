@@ -27,11 +27,8 @@ class ViewController: UIViewController {
     private var currentFullView: UILabel?
     
     // where multi swipe view will be placed
-    private var multiItemSize: CGSize {
-        return CGSize(width: 93.75, height: 50)
-    }
     private var multiViewRect: CGRect {
-        return CGRectMake(0, 20, self.view.width, 50)
+        return CGRectMake(0, 20, self.view.width, 100)
     }
     
     // where full swipe view will be placed
@@ -64,6 +61,8 @@ class ViewController: UIViewController {
         swipeViewMulti!.delegate = self
         swipeViewMulti!.tag = kMultiTag
         swipeViewMulti!.recycleEnabled = true
+        swipeViewMulti!.magnifyCenter = true
+        swipeViewMulti!.preferredMagnifyBonusRatio = 1.3
         swipeViewMulti!.pageControlHidden = true
         swipeViewMulti!.setBorder(0.5, color: UIColor.blackColor())
         swipeViewMulti!.backgroundColor = UIColor.clearColor()
@@ -108,11 +107,16 @@ class ViewController: UIViewController {
 // MARK: - HFSwipeViewDataSource
 extension ViewController: HFSwipeViewDataSource {
     func swipeViewItemDistance(swipeView: HFSwipeView) -> CGFloat {
-        return 0
+        if swipeView.tag == kMultiTag {
+            return 30   // left pad 15 + right pad 15
+        } else {
+            return 0
+        }
     }
     func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize {
         if swipeView.tag == kMultiTag {
-            return multiItemSize
+            // view [pad 15 + width 70 + pad 15] -> displays 100 width of cell
+            return CGSize(width: 70, height: 100)
         } else {
             return fullItemSize
         }
@@ -134,7 +138,8 @@ extension ViewController: HFSwipeViewDataSource {
             fullLabel.textAlignment = .Center
             view = fullLabel
         case kMultiTag:
-            let contentLabel = UILabel(frame: CGRect(origin: CGPointZero, size: multiItemSize))
+            // inner view with size
+            let contentLabel = UILabel(frame: CGRect(origin: CGPointMake(0, 15), size: CGSizeMake(70, 70)))
             contentLabel.text = "\(indexPath.row)"
             contentLabel.textAlignment = .Center
             view = contentLabel
@@ -148,6 +153,7 @@ extension ViewController: HFSwipeViewDataSource {
         if let label = view as? UILabel {
             label.text = "\(indexPath.row)"
             label.setBorder(0.5, color: UIColor.blackColor())
+            label.superview?.setBorder(1, color: UIColor.blackColor())
             
             switch swipeView.tag {
 //            case kMultiTag:
@@ -167,11 +173,13 @@ extension ViewController: HFSwipeViewDataSource {
             currentMultiView?.setBorder(0.5, color: UIColor.blackColor())
             currentMultiView = view as? UILabel
             currentMultiView?.text = "\(indexPath.row)"
-            currentMultiView?.setBorder(2, color: UIColor.blueColor())
+            currentMultiView?.setBorder(1, color: UIColor.blueColor())
+            currentMultiView?.superview?.setBorder(1, color: UIColor.blackColor())
         } else {
             currentFullView?.setBorder(0.5, color: UIColor.blackColor())
             currentFullView = view as? UILabel
-            currentFullView?.setBorder(2, color: UIColor.blueColor())
+            currentFullView?.setBorder(1, color: UIColor.blueColor())
+            currentFullView?.superview?.setBorder(1, color: UIColor.blackColor())
         }
     }
 }
