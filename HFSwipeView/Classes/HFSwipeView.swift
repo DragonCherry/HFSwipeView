@@ -272,9 +272,9 @@ public class HFSwipeView: UIView {
         } else {
             contentSize.width = ceil((itemSize.width + itemSpace) * CGFloat(itemCount + dummyCount * 2) - itemSpace)
         }
-        collectionLayout!.estimatedItemSize = itemSize
         collectionLayout!.itemSize = itemSize
         collectionView!.contentSize = contentSize
+        collectionView!.reloadSections(NSIndexSet(index: 0))
         log("successfully set content size: \(self.collectionView!.contentSize)")
         
         return true
