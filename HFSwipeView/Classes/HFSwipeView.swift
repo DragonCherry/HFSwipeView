@@ -217,12 +217,12 @@ public class HFSwipeView: UIView {
     private func calculate() -> Bool {
         
         // retrieve item distance
-        self.itemSpace = cgfloat(self.dataSource?.swipeViewItemDistance?(self), defaultValue: 0)
+        itemSpace = cgfloat(dataSource?.swipeViewItemDistance?(self), defaultValue: 0)
         log("successfully set itemSpace: \(itemSpace)")
         
         // retrieve item size
-        self.itemSize = self.dataSource?.swipeViewItemSize(self)
-        guard let itemSize = self.itemSize else {
+        itemSize = dataSource?.swipeViewItemSize(self)
+        guard let itemSize = itemSize else {
             loge("item size not provided")
             return false
         }
@@ -237,12 +237,12 @@ public class HFSwipeView: UIView {
         let itemCount = integer(self.dataSource?.swipeViewItemCount(self), defaultValue: 0)
         
         // pixel correction
-        let neededSpace = (itemSize.width + itemSpace) * CGFloat(itemCount) - (circulating ? 0 : itemSpace)
-        if self.width > neededSpace {
-            // if given width is wider than needed space
-            if itemCount > 0 {
-                itemSpace = (self.width - (itemSize.width * CGFloat(itemCount))) / CGFloat(itemCount - 1)
-                if circulating {
+        if circulating {
+            let neededSpace = (itemSize.width + itemSpace) * CGFloat(itemCount) - (circulating ? 0 : itemSpace)
+            if width > neededSpace {
+                // if given width is wider than needed space
+                if itemCount > 0 {
+                    itemSpace = (self.width - (itemSize.width * CGFloat(itemCount))) / CGFloat(itemCount - 1)
                     circulating = false
                     dummyWidth = 0
                     dummyCount = 0
@@ -250,9 +250,6 @@ public class HFSwipeView: UIView {
                     logw("circulating cancelled as given width(\(self.width)) is wider than needed space(\(neededSpace)).")
                 }
             }
-        }
-        
-        if circulating {
             dummyCount = itemCount
             if dummyCount >= 1 {
                 dummyWidth = CGFloat(dummyCount) * (itemSize.width + itemSpace)
@@ -263,6 +260,7 @@ public class HFSwipeView: UIView {
             log("successfully set realViewCount: \(realViewCount)")
             
         } else {
+            collectionView!.alwaysBounceHorizontal = true
             realViewCount = itemCount
         }
         
@@ -275,7 +273,7 @@ public class HFSwipeView: UIView {
         collectionLayout!.itemSize = itemSize
         collectionView!.contentSize = contentSize
         collectionView!.reloadSections(NSIndexSet(index: 0))
-        log("successfully set content size: \(self.collectionView!.contentSize)")
+        log("successfully set content size: \(collectionView!.contentSize)")
         
         return true
     }
@@ -432,18 +430,9 @@ extension HFSwipeView {
             newX += cellWidth * cgfloat(indexPath.row)
             newX -= (self.width - cellWidth) / 2
         } else {
-            let cellSpace = (itemSpace + cgfloat(itemSize?.width)) * cgfloat(indexPath.row)
-            newX = cellSpace - (self.width - cgfloat(itemSize?.width)) / 2
-            
-            if newX < 0 {
-                // while bouncing on left
-                newX = 0
-            }
-            let rightPivot = collectionView!.contentSize.width - self.width
-            if newX > rightPivot {
-                // while bouncing on right
-                newX = rightPivot
-            }
+            let cellWidth = itemSpace + cgfloat(itemSize?.width)
+            let cellSpace = cellWidth * cgfloat(indexPath.row)
+            newX = cellSpace - (self.width - cellWidth) / 2
         }
         
         // corrected index
@@ -667,9 +656,13 @@ extension HFSwipeView {
             return
         }
         log("\(#function)[\(self.tag)]: \(realPage)")
+        
         let realIndex = NSIndexPath(forItem: realPage, inSection: 0)
-        let offset = centeredOffsetForIndex(realIndex)
-        collectionView!.setContentOffset(offset, animated: animated)
+        
+        if autoAlignEnabled {
+            let offset = centeredOffsetForIndex(realIndex)
+            collectionView!.setContentOffset(offset, animated: animated)
+        }
         
         if !circulating {
             updateCurrentView(displayIndexUsing(realIndex))
