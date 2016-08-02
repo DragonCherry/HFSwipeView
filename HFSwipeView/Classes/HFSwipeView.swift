@@ -288,7 +288,7 @@ extension HFSwipeView {
     
     public func layoutViews() {
         
-        log("\(#function)")
+        log("\(self.dynamicType) - \(#function)")
         
         initialized = false
         
@@ -318,8 +318,15 @@ extension HFSwipeView {
         pageControl.numberOfPages = count
         
         if count > 0 {
-            let offset = centeredOffsetForIndex(NSIndexPath(forItem: currentRealPage < 0 ? dummyCount : currentRealPage, inSection: 0))
-            collectionView!.setContentOffset(offset, animated: false)
+            if circulating {
+                if currentRealPage < dummyCount {
+                    currentRealPage = dummyCount
+                } else if currentRealPage > count + dummyCount {
+                    currentRealPage = dummyCount
+                }
+                let offset = centeredOffsetForIndex(NSIndexPath(forItem: currentRealPage < 0 ? dummyCount : currentRealPage, inSection: 0))
+                collectionView!.setContentOffset(offset, animated: false)
+            }
         }
         prepareForInteraction()
     }
