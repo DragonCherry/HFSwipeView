@@ -210,6 +210,7 @@ public class HFSwipeView: UIView {
     }
     
     private func prepareForInteraction() {
+        applyMagnifyCenter()
         initialized = true
         collectionView!.userInteractionEnabled = true
     }
