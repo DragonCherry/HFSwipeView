@@ -62,7 +62,7 @@ class ViewController: UIViewController {
         swipeViewMulti!.tag = kMultiTag
         swipeViewMulti!.recycleEnabled = true
         swipeViewMulti!.magnifyCenter = true
-        swipeViewMulti!.preferredMagnifyBonusRatio = 1.3
+        swipeViewMulti!.preferredMagnifyBonusRatio = 1.5
         swipeViewMulti!.pageControlHidden = true
         swipeViewMulti!.setBorder(0.5, color: UIColor.blackColor())
         swipeViewMulti!.backgroundColor = UIColor.clearColor()

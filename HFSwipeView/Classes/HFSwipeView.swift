@@ -764,7 +764,7 @@ extension HFSwipeView {
         if let cellView = cell.contentView.viewWithTag(kSwipeViewCellContentTag) {
             var bonusRatio: CGFloat = preferredMagnifyBonusRatio
             let cellWidth = itemSize!.width + itemSpace
-            if cellView.width * bonusRatio > cellWidth {
+            if itemSize!.width * bonusRatio > cellWidth {
                 bonusRatio = cellWidth / itemSize!.width
             }
             
