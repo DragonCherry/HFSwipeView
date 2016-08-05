@@ -756,7 +756,7 @@ extension HFSwipeView {
             cellsText += "(\(cell.tag):\(ratio)) "
             magnifyCell(cell, forRatio: ratio)
         }
-        log("\(#function): \(cellsText)")
+//        log("\(#function): \(cellsText)")
     }
     
     private func magnifyCell(cell: UICollectionViewCell, forRatio ratio: CGFloat) {
@@ -774,7 +774,7 @@ extension HFSwipeView {
             } else {
                 bonusRatio = (ratio + 1) * (bonusRatio - 1) + 1
             }
-            log("bonusRatio: \(bonusRatio)")
+//            log("bonusRatio: \(bonusRatio)")
             
             let viewWidth = itemSize!.width * bonusRatio
             cellView.transform = CGAffineTransformMakeScale(bonusRatio, bonusRatio)
