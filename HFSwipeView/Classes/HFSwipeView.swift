@@ -779,7 +779,7 @@ extension HFSwipeView {
             let viewWidth = itemSize!.width * bonusRatio
             cellView.transform = CGAffineTransformMakeScale(bonusRatio, bonusRatio)
             let space = (cellWidth - viewWidth) / 2
-            cellView.frame.origin = CGPointMake(space + space * ratio, cellView.y)
+            cellView.frame.origin = CGPointMake(space, cellView.y)
         }
     }
     
