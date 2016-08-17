@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HFSwipeView'
-  s.version          = '0.8.5'
+  s.version          = '0.8.6'
   s.summary          = 'Infinite SwipeView for iOS.'
 
 # This description is used to generate tags and improve search results.
