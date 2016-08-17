@@ -325,6 +325,11 @@ extension HFSwipeView {
                 }
                 let offset = centeredOffsetForIndex(NSIndexPath(forItem: currentRealPage < 0 ? dummyCount : currentRealPage, inSection: 0))
                 collectionView!.setContentOffset(offset, animated: false)
+            } else {
+                currentPage = 0
+                currentRealPage = 0
+                let offset = centeredOffsetForIndex(NSIndexPath(forItem: currentRealPage < 0 ? 0 : currentRealPage, inSection: 0))
+                collectionView!.setContentOffset(offset, animated: false)
             }
         }
         prepareForInteraction()
@@ -652,7 +657,7 @@ extension HFSwipeView {
 extension HFSwipeView {
     
     private func moveRealPage(realPage: Int, animated: Bool) {
-        if realPage == currentRealPage {
+        if realPage >= 0 && realPage < realViewCount && realPage == currentRealPage {
             log("moveRealPage received same page(\(realPage)) == currentPage(\(currentRealPage))")
             return
         }
@@ -757,7 +762,7 @@ extension HFSwipeView {
             cellsText += "(\(cell.tag):\(ratio)) "
             magnifyCell(cell, forRatio: ratio)
         }
-//        log("\(#function): \(cellsText)")
+        //        log("\(#function): \(cellsText)")
     }
     
     private func magnifyCell(cell: UICollectionViewCell, forRatio ratio: CGFloat) {
@@ -775,7 +780,7 @@ extension HFSwipeView {
             } else {
                 bonusRatio = (ratio + 1) * (bonusRatio - 1) + 1
             }
-//            log("bonusRatio: \(bonusRatio)")
+            //            log("bonusRatio: \(bonusRatio)")
             
             let viewWidth = itemSize!.width * bonusRatio
             cellView.transform = CGAffineTransformMakeScale(bonusRatio, bonusRatio)
