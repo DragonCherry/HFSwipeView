@@ -57,7 +57,6 @@ class SimpleCirculatingController: UIViewController {
             } else {
                 label.backgroundColor = .whiteColor()
             }
-            
             label.textAlignment = .Center
             label.text = "\(indexPath.row)"
             label.setBorder(0.5, color: .blackColor())

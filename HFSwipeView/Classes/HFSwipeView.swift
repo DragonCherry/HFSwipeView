@@ -282,7 +282,7 @@ public class HFSwipeView: UIView {
         }
         collectionLayout!.itemSize = itemSize
         collectionView!.contentSize = contentSize
-        collectionView!.reloadSections(NSIndexSet(index: 0))
+        collectionView!.reloadData()
         log("successfully set content size: \(collectionView!.contentSize)")
         
         return true
@@ -612,7 +612,7 @@ extension HFSwipeView {
             // between both side
             index = collectionView!.indexPathForItemAtPoint(center)
         }
-        log("center = \(center), size = \(collectionView!.contentSize), offset: \(collectionView!.contentOffset), index: \(index?.row)")
+//        log("center = \(center), size = \(collectionView!.contentSize), offset: \(collectionView!.contentOffset), index: \(index?.row)")
         return index
     }
     
