@@ -19,10 +19,10 @@ extension UIView {
 public enum TestSegue: String {
     
     case
-    kSegueSimpleController = "kSegueSimpleController",
-    kSegueSimpleCirculatingController = "kSegueSimpleCirculatingController",
-    kSegueSyncController = "kSegueSyncController",
-    kSegueMagnifyController = "kSegueMagnifyController"
+    kSegueSimpleController                  = "kSegueSimpleController",
+    kSegueSimpleCirculatingController       = "kSegueSimpleCirculatingController",
+    kSegueSyncController                    = "kSegueSyncController",
+    kSegueMagnifyController                 = "kSegueMagnifyController"
     
     static let allValues: NSArray = [
         kSegueSimpleController.rawValue,
@@ -35,7 +35,7 @@ public enum TestSegue: String {
 class MainController: UIViewController {
     
     private let kTestCellMenuIdentifier = "kTestCellMenuIdentifier"
-    private var tableView: UITableView?
+    private var tableView: UITableView!
     
     let menuItems: NSArray = TestSegue.allValues
     
@@ -43,47 +43,63 @@ class MainController: UIViewController {
         super.init(coder: aDecoder)
     }
     
-    override func loadView() {
-        super.loadView()
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView = UITableView(frame: view.frame)
+        tableView.delegate = self
+        tableView.dataSource = self
+        view.addSubview(tableView)
     }
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
     }
     
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        log("prepareForSegue - \(segue.identifier)")
+    }
+    
+    func titleForIndexPath(indexPath: NSIndexPath) -> String {
+        var title: String!
+        switch indexPath.row {
+        case 0:
+            title = "Simple Example"
+        case 1:
+            title = "Circulating Example"
+        case 2:
+            title = "Sync Example"
+        case 3:
+            title = "Magnifying Example"
+        default:
+            title = ""
+        }
+        return title
+    }
+}
+
+extension MainController: UITableViewDelegate {
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let segue: String = menuItems.objectAtIndex(indexPath.row) as! String
+        log("tableView - didSelectRowAtIndexPath: \(indexPath.row), segue: \(segue)")
+        self.performSegueWithIdentifier(segue, sender: self)
+    }
+}
+
+extension MainController: UITableViewDataSource {
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return menuItems.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
         let dequeuedCell: UITableViewCell? = tableView.dequeueReusableCellWithIdentifier(kTestCellMenuIdentifier)
         var cell: UITableViewCell? = nil
-        
         if let dequeuedCell = dequeuedCell {
             cell = dequeuedCell
         } else {
             cell = UITableViewCell(style: .Default, reuseIdentifier: kTestCellMenuIdentifier)
             cell!.selectionStyle = .None
         }
-        
-        let title = menuItems.objectAtIndex(indexPath.row) as! String
-        cell?.textLabel!.text = title
-        
+        cell?.textLabel!.text = titleForIndexPath(indexPath)
         return cell!
-    }
-    
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let segue: String = menuItems.objectAtIndex(indexPath.row) as! String
-        log("tableView - didSelectRowAtIndexPath: \(indexPath.row), segue: \(segue)")
-        self.performSegueWithIdentifier(segue, sender: self)
-    }
-    
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        log("prepareForSegue - \(segue.identifier)")
     }
 }
