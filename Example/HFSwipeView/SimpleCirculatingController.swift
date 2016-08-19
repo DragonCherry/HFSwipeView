@@ -11,14 +11,14 @@ import HFSwipeView
 
 class SimpleCirculatingController: UIViewController {
     
-    private let sampleCount: Int = 10
+    private let sampleCount: Int = 5
     private var swipeView: HFSwipeView!
     private var currentView: UIView?
     private var itemSize: CGSize {
         return CGSizeMake(100, 100)
     }
     private var swipeViewFrame: CGRect {
-        return CGRectMake(0, 100, self.view.width, 100)
+        return CGRectMake(0, 100, view.width, 100)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -35,12 +35,14 @@ class SimpleCirculatingController: UIViewController {
         swipeView.dataSource = self
         swipeView.delegate = self
         swipeView.pageControlHidden = true
+        swipeView.currentPage = 0
         view.addSubview(swipeView)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.swipeView!.frame = swipeViewFrame
+        self.swipeView.frame = swipeViewFrame
+        self.swipeView.setBorder(0.5, color: .blackColor())
     }
     
     func updateCellView(view: UIView, indexPath: NSIndexPath, isCurrent: Bool) {
