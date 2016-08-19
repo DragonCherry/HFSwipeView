@@ -47,19 +47,18 @@ class SimpleCirculatingController: UIViewController {
         
         if let label = view as? UILabel {
             
-            label.backgroundColor = isCurrent ? .yellowColor() : .whiteColor()
-            
             if isCurrent {
                 // old view
                 currentView?.backgroundColor = .whiteColor()
                 currentView = label
+                currentView?.backgroundColor = .yellowColor()
+            } else {
+                label.backgroundColor = .whiteColor()
             }
             
             label.textAlignment = .Center
             label.text = "\(indexPath.row)"
             label.setBorder(0.5, color: .blackColor())
-            
-            
             
         } else {
             assertionFailure("failed to retrieve UILabel for index: \(indexPath.row)")
