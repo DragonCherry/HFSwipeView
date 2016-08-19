@@ -1,15 +1,16 @@
 //
-//  ViewController.swift
+//  SyncController.swift
 //  HFSwipeView
 //
-//  Created by DragonCherry on 07/16/2016.
-//  Copyright (c) 2016 DragonCherry. All rights reserved.
+//  Created by DragonCherry on 8/19/16.
+//  Copyright © 2016 CocoaPods. All rights reserved.
 //
 
 import UIKit
+import HFUtility
 import HFSwipeView
 
-class ViewController: UIViewController {
+class SyncController: UIViewController {
     
     // sample item count for two swipe view
     private let sampleCount: Int = 10
@@ -21,7 +22,10 @@ class ViewController: UIViewController {
     
     // where multi swipe view will be placed
     private var multiViewRect: CGRect {
-        return CGRectMake(0, 20, self.view.width, 100)
+        return CGRectMake(0, 64, self.view.width, 50)
+    }
+    private var multiItemSize: CGSize {
+        return CGSize(width: 100, height: multiViewRect.height)
     }
     
     // where full swipe view will be placed
@@ -36,80 +40,55 @@ class ViewController: UIViewController {
         return CGSize(width: self.view.width, height: fullViewRect.height)
     }
     
-    private var swipeViewMulti: HFSwipeView? = nil
-    private var swipeViewFull: HFSwipeView? = nil
+    private var swipeViewMulti: HFSwipeView!
+    private var swipeViewFull: HFSwipeView!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.automaticallyAdjustsScrollViewInsets = true
+        self.automaticallyAdjustsScrollViewInsets = false
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         swipeViewMulti = HFSwipeView(frame: multiViewRect)
-        swipeViewMulti!.autoAlignEnabled = true
-        swipeViewMulti!.circulating = true
-        swipeViewMulti!.dataSource = self
-        swipeViewMulti!.delegate = self
-        swipeViewMulti!.tag = kMultiTag
-        swipeViewMulti!.recycleEnabled = true
-        swipeViewMulti!.magnifyCenter = true
-        swipeViewMulti!.preferredMagnifyBonusRatio = 1.5
-        swipeViewMulti!.pageControlHidden = true
-        swipeViewMulti!.setBorder(0.5, color: UIColor.blackColor())
-        swipeViewMulti!.backgroundColor = UIColor.clearColor()
+        swipeViewMulti.autoAlignEnabled = true
+        swipeViewMulti.circulating = true
+        swipeViewMulti.dataSource = self
+        swipeViewMulti.delegate = self
+        swipeViewMulti.tag = kMultiTag
+        swipeViewMulti.recycleEnabled = true
+        swipeViewMulti.pageControlHidden = true
         self.view.addSubview(self.swipeViewMulti!)
         
         swipeViewFull = HFSwipeView(frame: fullViewRect)
-        swipeViewFull!.autoAlignEnabled = true
-        swipeViewFull!.circulating = true
-        swipeViewFull!.dataSource = self
-        swipeViewFull!.delegate = self
-        swipeViewFull!.tag = kFullTag
-        swipeViewFull!.recycleEnabled = true
-        swipeViewFull!.currentPageIndicatorTintColor = UIColor.blackColor()
-        swipeViewFull!.pageIndicatorTintColor = UIColor.lightGrayColor()
-        swipeViewFull!.setBorder(0.5, color: UIColor.blackColor())
-        swipeViewFull!.backgroundColor = UIColor.clearColor()
+        swipeViewFull.autoAlignEnabled = true
+        swipeViewFull.circulating = true
+        swipeViewFull.dataSource = self
+        swipeViewFull.delegate = self
+        swipeViewFull.tag = kFullTag
+        swipeViewFull.recycleEnabled = true
+        swipeViewFull.currentPageIndicatorTintColor = UIColor.blackColor()
+        swipeViewFull.pageIndicatorTintColor = UIColor.lightGrayColor()
+        swipeViewFull.backgroundColor = UIColor.clearColor()
         self.view.addSubview(self.swipeViewFull!)
         
-//        if swipeViewMulti!.circulating && swipeViewFull!.circulating {
-//            swipeViewMulti!.syncView = swipeViewFull
-//            swipeViewFull!.syncView = swipeViewMulti
-//        }
-        
-//        swipeViewMulti!.startAutoSlideForTimeInterval(1.5)
+        swipeViewFull.syncView = swipeViewMulti
+        swipeViewMulti.syncView = swipeViewFull
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.swipeViewFull!.frame = fullViewRect
-        self.swipeViewMulti!.frame = multiViewRect
-    }
-    
-    func colorForIndex(index: Int) -> UIColor {
-        return UIColor(
-            alpha: 1,
-            red: (((255 - 150) / sampleCount) * index + 150) % 256,
-            green: 200,
-            blue: (((255 - 150) / sampleCount) * index + 150) % 256)
+        self.swipeViewFull.frame = fullViewRect
+        self.swipeViewMulti.frame = multiViewRect
     }
 }
 
 // MARK: - HFSwipeViewDataSource
-extension ViewController: HFSwipeViewDataSource {
-    func swipeViewItemDistance(swipeView: HFSwipeView) -> CGFloat {
-        if swipeView.tag == kMultiTag {
-            return 30   // left pad 15 + right pad 15
-        } else {
-            return 0
-        }
-    }
+extension SyncController: HFSwipeViewDataSource {
     func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize {
         if swipeView.tag == kMultiTag {
-            // view [pad 15 + width 70 + pad 15] -> displays 100 width of cell
-            return CGSize(width: 70, height: 100)
+            return multiItemSize
         } else {
             return fullItemSize
         }
@@ -132,7 +111,7 @@ extension ViewController: HFSwipeViewDataSource {
             view = fullLabel
         case kMultiTag:
             // inner view with size
-            let contentLabel = UILabel(frame: CGRect(origin: CGPointMake(0, 15), size: CGSizeMake(70, 70)))
+            let contentLabel = UILabel(frame: CGRect(origin: CGPoint.zero, size: multiItemSize))
             contentLabel.text = "\(indexPath.row)"
             contentLabel.textAlignment = .Center
             view = contentLabel
@@ -147,15 +126,6 @@ extension ViewController: HFSwipeViewDataSource {
             label.text = "\(indexPath.row)"
             label.setBorder(0.5, color: UIColor.blackColor())
             label.superview?.setBorder(1, color: UIColor.blackColor())
-            
-            switch swipeView.tag {
-//            case kMultiTag:
-//                
-            case kFullTag:
-                label.backgroundColor = colorForIndex(indexPath.row)
-            default:
-                break
-            }
         } else {
             assertionFailure("failed to retrieve button for index: \(indexPath.row)")
         }
@@ -177,9 +147,8 @@ extension ViewController: HFSwipeViewDataSource {
     }
 }
 
-
 // MARK: - HFSwipeViewDelegate
-extension ViewController: HFSwipeViewDelegate {
+extension SyncController: HFSwipeViewDelegate {
     func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }

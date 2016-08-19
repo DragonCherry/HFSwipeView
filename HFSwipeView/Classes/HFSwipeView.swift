@@ -15,9 +15,7 @@ import HFUtility
     func swipeViewItemCount(swipeView: HFSwipeView) -> Int
     func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize
     func swipeView(swipeView: HFSwipeView, viewForIndexPath indexPath: NSIndexPath) -> UIView
-    /// This delegate method will invoked only in recycle mode.
     optional func swipeView(swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: NSIndexPath, view: UIView)
-    /// This delegate method will invoked only in recycle mode.
     optional func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView)
     /// This delegate method will invoked only in circulation mode.
     optional func swipeViewContentInsets(swipeView: HFSwipeView) -> UIEdgeInsets
@@ -75,6 +73,21 @@ public class HFSwipeView: UIView {
     private var pageControl: UIPageControl!
     private var collectionLayout: HFSwipeViewFlowLayout?
     private var indexViewMapper = [Int: UIView]()
+    private var contentInsets: UIEdgeInsets {
+        if var insets = dataSource?.swipeViewContentInsets?(self) {
+            if insets.top != 0 {
+                logw("Changing UIEdgeInsets.top for HFSwipeView is not supported yet, consider a container view instead.")
+                insets.top = 0
+            }
+            if insets.bottom != 0 {
+                logw("Changing UIEdgeInsets.bottom for HFSwipeView is not supported yet, consider a container view instead.")
+                insets.bottom = 0
+            }
+            return insets
+        } else {
+            return UIEdgeInsetsZero
+        }
+    }
     
     // MARK: Loop Control Variables
     private var dummyCount: Int = 0
@@ -243,12 +256,8 @@ public class HFSwipeView: UIView {
             if width > neededSpace {
                 // if given width is wider than needed space
                 if itemCount > 0 {
-                    itemSpace = (self.width - (itemSize.width * CGFloat(itemCount))) / CGFloat(itemCount - 1)
-                    circulating = false
-                    dummyWidth = 0
-                    dummyCount = 0
+                    itemSpace = (width - (itemSize.width * CGFloat(itemCount))) / CGFloat(itemCount)
                     logw("successfully fixed itemSpace: \(itemSpace)")
-                    logw("circulating cancelled as given width(\(self.width)) is wider than needed space(\(neededSpace)).")
                 }
             }
             dummyCount = itemCount
@@ -273,7 +282,7 @@ public class HFSwipeView: UIView {
         }
         collectionLayout!.itemSize = itemSize
         collectionView!.contentSize = contentSize
-        collectionView!.reloadSections(NSIndexSet(index: 0))
+        collectionView!.reloadData()
         log("successfully set content size: \(collectionView!.contentSize)")
         
         return true
@@ -439,6 +448,12 @@ extension HFSwipeView {
             let cellWidth = itemSpace + cgfloat(itemSize?.width)
             let cellSpace = cellWidth * cgfloat(indexPath.row)
             newX = cellSpace - (self.width - cellWidth) / 2
+            if newX < 0 {
+                newX = 0
+            }
+            if newX > collectionView!.contentSize.width - width {
+                newX = collectionView!.contentSize.width - width
+            }
         }
         
         // corrected index
@@ -487,24 +502,24 @@ extension HFSwipeView {
             return
         }
         
-        guard let indexPath = indexPathForItemAtPoint(collectionView!.contentOffset) else {
+        guard var indexPath = indexPathForItemAtPoint(collectionView!.contentOffset) else {
             logw("indexPathForItemAtPoint returned nil.")
             return
         }
         
         let displayIndex = displayIndexUsing(indexPath)
-        let oldPage = currentPage
+        let oldPage = currentRealPage
         
         currentPage = displayIndex.row
         currentRealPage = indexPath.row
         
-        if oldPage != currentPage {
+        if oldPage != currentRealPage {
             pageControl.currentPage = displayIndex.row
             delegate?.swipeView?(self, didChangeIndexPath: displayIndex)
-            if let view = indexViewMapper[currentPage] {
+            if let view = indexViewMapper[currentRealPage] {
                 dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: view)
             } else {
-                loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(indexPath.row)")
+                loge("Failed to retrieve current view from indexViewMapper for indexPath: \(indexPath.row)")
             }
             log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
         }
@@ -585,6 +600,7 @@ extension HFSwipeView {
         
         let rightEdge = collectionView!.contentOffset.x + collectionView!.width
         var index: NSIndexPath? = nil
+        let center = centerOffset()
         
         if offset.x < 0 {
             // left edge
@@ -594,9 +610,9 @@ extension HFSwipeView {
             index = NSIndexPath(forRow: count - 1, inSection: 0)
         } else {
             // between both side
-            index = collectionView!.indexPathForItemAtPoint(centerOffset())
+            index = collectionView!.indexPathForItemAtPoint(center)
         }
-        //        log("size = \(collectionView!.contentSize), offset: \(collectionView!.contentOffset), index: \(index?.row)")
+//        log("center = \(center), size = \(collectionView!.contentSize), offset: \(collectionView!.contentOffset), index: \(index?.row)")
         return index
     }
     
@@ -678,10 +694,10 @@ extension HFSwipeView {
     private func updateCurrentView(displayIndex: NSIndexPath) {
         currentPage = displayIndex.row
         currentRealPage = displayIndex.row
-        if let view = indexViewMapper[currentPage] {
+        if let view = indexViewMapper[currentRealPage] {
             dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: view)
         } else {
-            loge("Failed to retrieve changed view from indexViewMapper for indexPath: \(displayIndex.row)")
+            loge("Failed to retrieve current view from indexViewMapper for indexPath: \(displayIndex.row)")
         }
         
     }
@@ -826,7 +842,6 @@ extension HFSwipeView: UICollectionViewDataSource {
     }
     
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        
         if circulating {
             return cellForItemInCirculationMode(collectionView, indexPath: indexPath)
         } else {
@@ -843,24 +858,19 @@ extension HFSwipeView: UICollectionViewDataSource {
         }
         
         let displayIndex: NSIndexPath = displayIndexUsing(indexPath)
-        var cellView: UIView? = nil
         
+        var cellView: UIView? = nil
         if recycleEnabled {
-            // user-created content view may exists while recycling is enabled
             cellView = cell.contentView.viewWithTag(kSwipeViewCellContentTag)
+        } else {
+            cell.contentView.viewWithTag(kSwipeViewCellContentTag)?.removeFromSuperview()
         }
         if cellView == nil {
             // set cellView as newly created view
             cellView = dataSource.swipeView(self, viewForIndexPath: displayIndex)
             cellView!.tag = kSwipeViewCellContentTag
         }
-        indexViewMapper[displayIndex.row] = cellView
-        
-        if displayIndex.row == currentPage {
-            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
-        } else {
-            dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
-        }
+        indexViewMapper[indexPath.row] = cellView
         
         // locate content view at center of given cell
         cellView!.frame.origin.x = itemSpace / 2
@@ -870,7 +880,14 @@ extension HFSwipeView: UICollectionViewDataSource {
             cell.tag = indexPath.row
             applyMagnifyCenter(forCell: cell)
         }
-        updateIndexBasedOnContentOffset()
+        
+        if displayIndex.row == currentPage {
+            log("\(#function)[CURRENT][\(displayIndex.row)/\(indexPath.row)]")
+            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
+        } else {
+            log("\(#function)[NORMAL][\(displayIndex.row)/\(indexPath.row)]")
+            dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
+        }
         return cell
     }
     
@@ -880,12 +897,11 @@ extension HFSwipeView: UICollectionViewDataSource {
             loge("dataSource is nil")
             return cell
         }
-        
         var cellView: UIView? = nil
-        
         if recycleEnabled {
-            // user-created content view may exists while recycling is enabled
             cellView = cell.contentView.viewWithTag(kSwipeViewCellContentTag)
+        } else {
+            cell.contentView.viewWithTag(kSwipeViewCellContentTag)?.removeFromSuperview()
         }
         if cellView == nil {
             // set cellView as newly created view
@@ -961,20 +977,7 @@ extension HFSwipeView: UICollectionViewDelegateFlowLayout {
     }
     
     public func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
-        if !circulating {
-            if var insets = dataSource?.swipeViewContentInsets?(self) {
-                if insets.top != 0 {
-                    logw("Changing UIEdgeInsets.top for HFSwipeView is not supported yet, consider a container view instead.")
-                    insets.top = 0
-                }
-                if insets.bottom != 0 {
-                    logw("Changing UIEdgeInsets.bottom for HFSwipeView is not supported yet, consider a container view instead.")
-                    insets.bottom = 0
-                }
-                return insets
-            }
-        }
-        return UIEdgeInsetsZero
+        return contentInsets
     }
     
     public func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumitemSpaceForSectionAtIndex section: Int) -> CGFloat {
@@ -997,8 +1000,6 @@ extension HFSwipeView: UICollectionViewDelegateFlowLayout {
 // MARK: - UIScrollViewDelegate
 extension HFSwipeView: UIScrollViewDelegate {
     
-    
-    
     public func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         if circulating {
             pauseAutoSlide()
@@ -1014,7 +1015,6 @@ extension HFSwipeView: UIScrollViewDelegate {
         }
         
         if circulating {
-            //            log("\(#function)[\(self.tag)]")
             scrollViewFixOffset(scrollView)
             postSync(scrollView.contentOffset, contentSize: scrollView.contentSize)
         }
