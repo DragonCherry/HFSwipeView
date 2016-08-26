@@ -519,7 +519,7 @@ extension HFSwipeView {
             if let view = indexViewMapper[currentRealPage] {
                 dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: view)
             } else {
-                loge("Failed to retrieve current view from indexViewMapper for indexPath: \(indexPath.row)")
+                logw("Failed to retrieve current view from indexViewMapper for indexPath: \(indexPath.row)")
             }
             log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
         }
@@ -697,7 +697,7 @@ extension HFSwipeView {
         if let view = indexViewMapper[currentRealPage] {
             dataSource?.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: view)
         } else {
-            loge("Failed to retrieve current view from indexViewMapper for indexPath: \(displayIndex.row)")
+            logw("Failed to retrieve current view from indexViewMapper for indexPath: \(displayIndex.row)")
         }
         
     }
