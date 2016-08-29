@@ -24,11 +24,30 @@
                         <segue destination="x0g-Ug-Iy8" kind="show" identifier="kSegueSimpleCirculatingController" id="T4Y-Qt-deZ"/>
                         <segue destination="b7f-QG-mi0" kind="show" identifier="kSegueSyncController" id="y9c-6A-YVM"/>
                         <segue destination="TAJ-ja-p7M" kind="show" identifier="kSegueMagnifyController" id="Z3K-4Y-VtO"/>
+                        <segue destination="x6c-ke-ynX" kind="show" identifier="kSegueAutoSlideController" id="ulK-lg-rbh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1389" y="318"/>
+        </scene>
+        <!--Auto Slide Controller-->
+        <scene sceneID="rzg-lu-BcS">
+            <objects>
+                <viewController id="x6c-ke-ynX" customClass="AutoSlideController" customModule="HFSwipeView_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="WQ4-7x-PKb"/>
+                        <viewControllerLayoutGuide type="bottom" id="PPK-73-RBf"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="vpT-q7-vq5">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="S8q-VA-VEw" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2103" y="1923"/>
         </scene>
         <!--Magnify Controller-->
         <scene sceneID="9bX-hN-SJY">
