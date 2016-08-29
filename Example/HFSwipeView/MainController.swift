@@ -23,14 +23,16 @@ public enum TestSegue: String {
     kSegueSimpleCirculatingController       = "kSegueSimpleCirculatingController",
     kSegueSyncController                    = "kSegueSyncController",
     kSegueMagnifyController                 = "kSegueMagnifyController",
-    kSegueAutoSlideController               = "kSegueAutoSlideController"
+    kSegueAutoSlideController               = "kSegueAutoSlideController",
+    kSegueEdgePreviewController             = "kSegueEdgePreviewController"
     
     static let allValues: NSArray = [
         kSegueSimpleController.rawValue,
         kSegueSimpleCirculatingController.rawValue,
         kSegueSyncController.rawValue,
         kSegueMagnifyController.rawValue,
-        kSegueAutoSlideController.rawValue
+        kSegueAutoSlideController.rawValue,
+        kSegueEdgePreviewController.rawValue
     ]
 }
 
@@ -74,6 +76,8 @@ class MainController: UIViewController {
             title = "Magnifying"
         case 4:
             title = "Auto Slide"
+        case 5:
+            title = "Edge Preview"
         default:
             title = ""
         }

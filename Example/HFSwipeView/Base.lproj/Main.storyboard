@@ -25,11 +25,30 @@
                         <segue destination="b7f-QG-mi0" kind="show" identifier="kSegueSyncController" id="y9c-6A-YVM"/>
                         <segue destination="TAJ-ja-p7M" kind="show" identifier="kSegueMagnifyController" id="Z3K-4Y-VtO"/>
                         <segue destination="x6c-ke-ynX" kind="show" identifier="kSegueAutoSlideController" id="ulK-lg-rbh"/>
+                        <segue destination="SBp-Ls-7fo" kind="show" identifier="kSegueEdgePreviewController" id="bna-2S-wl1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1389" y="318"/>
+        </scene>
+        <!--Edge Preview Controller-->
+        <scene sceneID="JxK-VP-enF">
+            <objects>
+                <viewController id="SBp-Ls-7fo" customClass="EdgePreviewController" customModule="HFSwipeView_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="iGz-DW-8SN"/>
+                        <viewControllerLayoutGuide type="bottom" id="KCJ-Vp-6WY"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="NRZ-Ag-EEc">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="nhq-vE-ZgP" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2103" y="2617"/>
         </scene>
         <!--Auto Slide Controller-->
         <scene sceneID="rzg-lu-BcS">
