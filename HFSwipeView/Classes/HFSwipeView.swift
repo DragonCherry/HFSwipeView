@@ -8,7 +8,7 @@
 
 import UIKit
 import HFUtility
-
+import HFCoreUI
 
 // MARK: - HFSwipeViewDataSource
 @objc public protocol HFSwipeViewDataSource: NSObjectProtocol {
