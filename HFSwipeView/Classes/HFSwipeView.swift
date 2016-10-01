@@ -502,7 +502,7 @@ extension HFSwipeView {
             return
         }
         
-        guard var indexPath = indexPathForItemAtPoint(collectionView!.contentOffset) else {
+        guard let indexPath = indexPathForItemAtPoint(collectionView!.contentOffset) else {
             logw("indexPathForItemAtPoint returned nil.")
             return
         }
