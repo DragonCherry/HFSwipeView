@@ -21,11 +21,11 @@ class EdgePreviewController: UIViewController {
         return CGRectMake(
             0,
             100,
-            self.view.width,
-            self.view.width)
+            self.view.frame.size.width,
+            self.view.frame.size.width)
     }
     private var fullItemSize: CGSize {
-        return CGSize(width: self.view.width - 70, height: self.view.width)
+        return CGSize(width: self.view.frame.size.width - 70, height: self.view.frame.size.width)
     }
     
     private var swipeView: HFSwipeView!

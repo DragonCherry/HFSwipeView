@@ -18,7 +18,7 @@ class AutoSlideController: UIViewController {
         return CGSizeMake(100, 100)
     }
     private var swipeViewFrame: CGRect {
-        return CGRectMake(0, 100, view.width, 100)
+        return CGRectMake(0, 100, view.frame.size.width, 100)
     }
     
     required init?(coder aDecoder: NSCoder) {
