@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import HFUtility
 
 extension UIView {
     public func setBorder(width: CGFloat, color: UIColor) {
@@ -60,7 +59,7 @@ class MainController: UIViewController {
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        log("prepareForSegue - \(segue.identifier)")
+        print("prepareForSegue - \(segue.identifier)")
     }
     
     func titleForIndexPath(indexPath: NSIndexPath) -> String {
@@ -88,7 +87,7 @@ class MainController: UIViewController {
 extension MainController: UITableViewDelegate {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let segue: String = menuItems.objectAtIndex(indexPath.row) as! String
-        log("tableView - didSelectRowAtIndexPath: \(indexPath.row), segue: \(segue)")
+        print("tableView - didSelectRowAtIndexPath: \(indexPath.row), segue: \(segue)")
         self.performSegueWithIdentifier(segue, sender: self)
     }
 }
