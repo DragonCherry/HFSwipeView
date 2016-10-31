@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import HFUtility
 import HFSwipeView
 
 class SyncController: UIViewController {
