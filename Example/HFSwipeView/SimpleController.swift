@@ -18,7 +18,7 @@ class SimpleController: UIViewController {
         return CGSizeMake(100, 100)
     }
     private var swipeViewFrame: CGRect {
-        return CGRectMake(0, 100, self.view.width, 100)
+        return CGRectMake(0, 100, self.view.frame.size.width, 100)
     }
     
     required init?(coder aDecoder: NSCoder) {

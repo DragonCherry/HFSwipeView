@@ -22,7 +22,7 @@ class SyncController: UIViewController {
     
     // where multi swipe view will be placed
     private var multiViewRect: CGRect {
-        return CGRectMake(0, 64, self.view.width, 50)
+        return CGRectMake(0, 64, self.view.frame.size.width, 50)
     }
     private var multiItemSize: CGSize {
         return CGSize(width: 100, height: multiViewRect.height)
@@ -33,11 +33,11 @@ class SyncController: UIViewController {
         return CGRectMake(
             0,
             multiViewRect.origin.y + multiViewRect.height,
-            self.view.width,
-            self.view.height - (multiViewRect.origin.y + multiViewRect.height))
+            self.view.frame.size.width,
+            self.view.frame.size.height - (multiViewRect.origin.y + multiViewRect.height))
     }
     private var fullItemSize: CGSize {
-        return CGSize(width: self.view.width, height: fullViewRect.height)
+        return CGSize(width: self.view.frame.size.width, height: fullViewRect.height)
     }
     
     private var swipeViewMulti: HFSwipeView!

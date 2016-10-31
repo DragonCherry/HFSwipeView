@@ -19,7 +19,7 @@ class MagnifyController: UIViewController {
         return CGSizeMake(70, 70)
     }
     private var swipeViewFrame: CGRect {
-        return CGRectMake(0, 100, view.width, 100)
+        return CGRectMake(0, 100, view.frame.size.width, 100)
     }
     
     required init?(coder aDecoder: NSCoder) {

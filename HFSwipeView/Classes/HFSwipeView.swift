@@ -7,8 +7,30 @@
 //
 
 import UIKit
-import HFUtility
-import HFCoreUI
+
+// MARK: Common Utilities
+internal func printDetail(message: AnyObject) {
+    #if DEBUG
+        print("(\(String(#file)):\(#line)) \(message)")
+    #endif
+}
+
+internal func log(message: AnyObject?) {
+    #if DEBUG
+        if let message = message {
+            print(message)
+        } else {
+            printDetail("nil message")
+        }
+    #endif
+}
+
+internal func loge(message: AnyObject?) { printDetail("[Error]: \(message)") }
+internal func loge(error: ErrorType?) { printDetail("[Error]: \(error)") }
+internal func logw(message: AnyObject?) { printDetail("[Warning]: \(message)") }
+internal func integer(object: AnyObject?, defaultValue: Int = 0) -> Int { return object?.integerValue ?? defaultValue }
+internal func cgfloat(object: AnyObject?, defaultValue: CGFloat = 0) -> CGFloat { return CGFloat(object?.floatValue ?? defaultValue) }
+
 
 // MARK: - HFSwipeViewDataSource
 @objc public protocol HFSwipeViewDataSource: NSObjectProtocol {
@@ -205,7 +227,7 @@ public class HFSwipeView: UIView {
         collectionLayout = flowLayout
         
         // collection
-        let view = UICollectionView(frame: CGRectMake(0, 0, self.width, self.height), collectionViewLayout: self.collectionLayout!)
+        let view = UICollectionView(frame: CGRectMake(0, 0, frame.size.width, frame.size.height), collectionViewLayout: self.collectionLayout!)
         view.backgroundColor = UIColor.clearColor()
         view.dataSource = self
         view.delegate = self
@@ -253,10 +275,10 @@ public class HFSwipeView: UIView {
         // pixel correction
         if circulating {
             let neededSpace = (itemSize.width + itemSpace) * CGFloat(itemCount) - (circulating ? 0 : itemSpace)
-            if width > neededSpace {
+            if frame.size.width > neededSpace {
                 // if given width is wider than needed space
                 if itemCount > 0 {
-                    itemSpace = (width - (itemSize.width * CGFloat(itemCount))) / CGFloat(itemCount)
+                    itemSpace = (frame.size.width - (itemSize.width * CGFloat(itemCount))) / CGFloat(itemCount)
                     logw("successfully fixed itemSpace: \(itemSpace)")
                 }
             }
@@ -306,20 +328,20 @@ extension HFSwipeView {
         // calculate for view presentation
         if calculate() {
             if let itemSize = self.itemSize {
-                collectionView!.size = CGSizeMake(self.width, itemSize.height)
+                collectionView!.frame.size = CGSizeMake(frame.size.width, itemSize.height)
             }
         }
         
         // page control
         self.pageControl.frame = CGRectMake(
             kPageControlHorizontalPadding,
-            self.height - kPageControlHeight,
-            self.width - 2 * kPageControlHorizontalPadding,
+            frame.size.height - kPageControlHeight,
+            frame.size.width - 2 * kPageControlHorizontalPadding,
             kPageControlHeight)
         
         // resize page control to match width for swipe view
         let neededWidthForPages = pageControl.sizeForNumberOfPages(count).width
-        let ratio = self.pageControl.width / neededWidthForPages
+        let ratio = pageControl.frame.size.width / neededWidthForPages
         if ratio < 1 {
             pageControl.transform = CGAffineTransformMakeScale(ratio, ratio)
         }
@@ -434,7 +456,7 @@ extension HFSwipeView {
 extension HFSwipeView {
     private func centerOffset() -> CGPoint {
         var center = self.collectionView!.contentOffset
-        center.x += self.width / 2
+        center.x += frame.size.width / 2
         return center
     }
     
@@ -443,21 +465,21 @@ extension HFSwipeView {
         if circulating {
             let cellWidth = itemSpace + cgfloat(itemSize?.width)
             newX += cellWidth * cgfloat(indexPath.row)
-            newX -= (self.width - cellWidth) / 2
+            newX -= (frame.size.width - cellWidth) / 2
         } else {
             let cellWidth = itemSpace + cgfloat(itemSize?.width)
             let cellSpace = cellWidth * cgfloat(indexPath.row)
-            newX = cellSpace - (self.width - cellWidth) / 2
+            newX = cellSpace - (frame.size.width - cellWidth) / 2
             if newX < 0 {
                 newX = 0
             }
-            if newX > collectionView!.contentSize.width - width {
-                newX = collectionView!.contentSize.width - width
+            if newX > collectionView!.contentSize.width - frame.size.width {
+                newX = collectionView!.contentSize.width - frame.size.width
             }
         }
         
         // corrected index
-        let centeredOffset = CGPoint(x: newX, y: collectionView!.y)
+        let centeredOffset = CGPoint(x: newX, y: collectionView!.frame.origin.y)
         return centeredOffset
     }
     
@@ -598,7 +620,7 @@ extension HFSwipeView {
     
     private func indexPathForItemAtPoint(offset: CGPoint) -> NSIndexPath? {
         
-        let rightEdge = collectionView!.contentOffset.x + collectionView!.width
+        let rightEdge = collectionView!.contentOffset.x + collectionView!.frame.size.width
         var index: NSIndexPath? = nil
         let center = centerOffset()
         
@@ -725,8 +747,8 @@ extension HFSwipeView {
                 logw("receiver HFSwipeView is not ready.")
                 return
         }
-        let ratio = (posterOffset.x + (poster.width - posterItemSize.width) / 2) / posterSize.width
-        let newOffset = CGPoint(x: receiverSize.width * ratio - (self.width - receiverItemSize.width) / 2, y: receiverOffset.y)
+        let ratio = (posterOffset.x + (poster.frame.size.width - posterItemSize.width) / 2) / posterSize.width
+        let newOffset = CGPoint(x: receiverSize.width * ratio - (frame.size.width - receiverItemSize.width) / 2, y: receiverOffset.y)
         setContentOffsetWithoutCallingDelegate(newOffset)
         updateIndexBasedOnContentOffset()
     }
@@ -735,7 +757,7 @@ extension HFSwipeView {
         if autoAlignEnabled {
             if !circulating {
                 let offset = scrollView.contentOffset
-                if offset.x > 0 && offset.x < scrollView.contentSize.width - self.width {
+                if offset.x > 0 && offset.x < scrollView.contentSize.width - frame.size.width {
                     collectionView!.scrollToItemAtIndexPath(indexPath, atScrollPosition: .CenteredHorizontally, animated: true)
                 }
             } else {
@@ -755,7 +777,7 @@ extension HFSwipeView {
         }
         
         let left = self.collectionView!.contentOffset.x + itemSize!.width / 2
-        let right = self.collectionView!.contentOffset.x + width - itemSize!.width / 2
+        let right = self.collectionView!.contentOffset.x + frame.size.width - itemSize!.width / 2
         let center = centerOffset().x
         let ratio = centerRatio(left, right: right, center: center, cell: cell)
         
@@ -770,7 +792,7 @@ extension HFSwipeView {
         var cellsText = ""
         
         let left = self.collectionView!.contentOffset.x + itemSize!.width / 2
-        let right = self.collectionView!.contentOffset.x + width - itemSize!.width / 2
+        let right = self.collectionView!.contentOffset.x + frame.size.width - itemSize!.width / 2
         let center = centerOffset().x
         
         for cell in cells {
@@ -801,7 +823,7 @@ extension HFSwipeView {
             let viewWidth = itemSize!.width * bonusRatio
             cellView.transform = CGAffineTransformMakeScale(bonusRatio, bonusRatio)
             let space = (cellWidth - viewWidth) / 2
-            cellView.frame.origin = CGPointMake(space, cellView.y)
+            cellView.frame.origin = CGPointMake(space, cellView.frame.origin.y)
         }
     }
     
@@ -959,7 +981,7 @@ extension HFSwipeView: UICollectionViewDelegateFlowLayout {
             return CGSizeZero
         }
         
-        if self.width < itemSize.width {
+        if frame.size.width < itemSize.width {
             loge("item size cannot exceeds parent swipe view")
             return CGSizeZero
         }
