@@ -9,9 +9,9 @@
 import UIKit
 
 extension UIView {
-    public func setBorder(width: CGFloat, color: UIColor) {
+    public func setBorder(_ width: CGFloat, color: UIColor) {
         self.layer.borderWidth = width
-        self.layer.borderColor = color.CGColor
+        self.layer.borderColor = color.cgColor
     }
 }
 
@@ -37,8 +37,8 @@ public enum TestSegue: String {
 
 class MainController: UIViewController {
     
-    private let kTestCellMenuIdentifier = "kTestCellMenuIdentifier"
-    private var tableView: UITableView!
+    fileprivate let kTestCellMenuIdentifier = "kTestCellMenuIdentifier"
+    fileprivate var tableView: UITableView!
     
     let menuItems: NSArray = TestSegue.allValues
     
@@ -54,15 +54,15 @@ class MainController: UIViewController {
         view.addSubview(tableView)
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         print("prepareForSegue - \(segue.identifier)")
     }
     
-    func titleForIndexPath(indexPath: NSIndexPath) -> String {
+    func titleForIndexPath(_ indexPath: IndexPath) -> String {
         var title: String!
         switch indexPath.row {
         case 0:
@@ -85,26 +85,26 @@ class MainController: UIViewController {
 }
 
 extension MainController: UITableViewDelegate {
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let segue: String = menuItems.objectAtIndex(indexPath.row) as! String
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let segue: String = menuItems.object(at: indexPath.row) as! String
         print("tableView - didSelectRowAtIndexPath: \(indexPath.row), segue: \(segue)")
-        self.performSegueWithIdentifier(segue, sender: self)
+        self.performSegue(withIdentifier: segue, sender: self)
     }
 }
 
 extension MainController: UITableViewDataSource {
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return menuItems.count
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let dequeuedCell: UITableViewCell? = tableView.dequeueReusableCellWithIdentifier(kTestCellMenuIdentifier)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let dequeuedCell: UITableViewCell? = tableView.dequeueReusableCell(withIdentifier: kTestCellMenuIdentifier)
         var cell: UITableViewCell? = nil
         if let dequeuedCell = dequeuedCell {
             cell = dequeuedCell
         } else {
-            cell = UITableViewCell(style: .Default, reuseIdentifier: kTestCellMenuIdentifier)
-            cell!.selectionStyle = .None
+            cell = UITableViewCell(style: .default, reuseIdentifier: kTestCellMenuIdentifier)
+            cell!.selectionStyle = .none
         }
         cell?.textLabel!.text = titleForIndexPath(indexPath)
         return cell!

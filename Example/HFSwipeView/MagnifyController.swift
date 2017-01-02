@@ -11,14 +11,14 @@ import HFSwipeView
 
 class MagnifyController: UIViewController {
     
-    private let sampleCount: Int = 5
-    private var swipeView: HFSwipeView!
-    private var currentView: UIView?
-    private var itemSize: CGSize {
-        return CGSizeMake(70, 70)
+    fileprivate let sampleCount: Int = 5
+    fileprivate var swipeView: HFSwipeView!
+    fileprivate var currentView: UIView?
+    fileprivate var itemSize: CGSize {
+        return CGSize(width: 70, height: 70)
     }
-    private var swipeViewFrame: CGRect {
-        return CGRectMake(0, 100, view.frame.size.width, 100)
+    fileprivate var swipeViewFrame: CGRect {
+        return CGRect(x: 0, y: 100, width: view.frame.size.width, height: 100)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -44,25 +44,25 @@ class MagnifyController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         self.swipeView.frame = swipeViewFrame
-        self.swipeView.setBorder(0.5, color: .blackColor())
+        self.swipeView.setBorder(0.5, color: .black)
     }
     
-    func updateCellView(view: UIView, indexPath: NSIndexPath, isCurrent: Bool) {
+    func updateCellView(_ view: UIView, indexPath: IndexPath, isCurrent: Bool) {
         
         if let label = view as? UILabel {
             
             if isCurrent {
                 // old view
-                currentView?.backgroundColor = .whiteColor()
+                currentView?.backgroundColor = .white
                 currentView = label
-                currentView?.backgroundColor = .yellowColor()
+                currentView?.backgroundColor = .yellow
             } else {
-                label.backgroundColor = .whiteColor()
+                label.backgroundColor = .white
             }
             
-            label.textAlignment = .Center
+            label.textAlignment = .center
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: .blackColor())
+            label.setBorder(0.5, color: .black)
             
         } else {
             assertionFailure("failed to retrieve UILabel for index: \(indexPath.row)")
@@ -72,43 +72,43 @@ class MagnifyController: UIViewController {
 
 // MARK: - HFSwipeViewDelegate
 extension MagnifyController: HFSwipeViewDelegate {
-    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath) {
+    func swipeView(_ swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: IndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath) {
+    func swipeView(_ swipeView: HFSwipeView, didSelectItemAtPath indexPath: IndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, changedView view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, didChangeIndexPath indexPath: IndexPath, changedView view: UIView) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
 }
 
 // MARK: - HFSwipeViewDataSource
 extension MagnifyController: HFSwipeViewDataSource {
-    func swipeViewItemDistance(swipeView: HFSwipeView) -> CGFloat {
+    func swipeViewItemDistance(_ swipeView: HFSwipeView) -> CGFloat {
         return 30   // left pad 15 + right pad 15
     }
-    func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize {
+    func swipeViewItemSize(_ swipeView: HFSwipeView) -> CGSize {
         // view [pad 15 + width 70 + pad 15] -> displays 100 width of cell
         return CGSize(width: 70, height: 100)
     }
-    func swipeViewItemCount(swipeView: HFSwipeView) -> Int {
+    func swipeViewItemCount(_ swipeView: HFSwipeView) -> Int {
         return sampleCount
     }
-    func swipeView(swipeView: HFSwipeView, viewForIndexPath indexPath: NSIndexPath) -> UIView {
-        let contentLabel = UILabel(frame: CGRect(origin: CGPointMake(0, 15), size: CGSizeMake(70, 70)))
+    func swipeView(_ swipeView: HFSwipeView, viewForIndexPath indexPath: IndexPath) -> UIView {
+        let contentLabel = UILabel(frame: CGRect(origin: CGPoint(x: 0, y: 15), size: CGSize(width: 70, height: 70)))
         contentLabel.text = "\(indexPath.row)"
-        contentLabel.textAlignment = .Center
+        contentLabel.textAlignment = .center
         contentLabel.layer.cornerRadius = 35
         contentLabel.layer.masksToBounds = true
         return contentLabel
     }
-    func swipeView(swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: IndexPath, view: UIView) {
         updateCellView(view, indexPath: indexPath, isCurrent: false)
     }
-    func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: IndexPath, view: UIView) {
         updateCellView(view, indexPath: indexPath, isCurrent: true)
     }
 }

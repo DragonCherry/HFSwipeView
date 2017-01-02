@@ -12,35 +12,35 @@ import HFSwipeView
 class SyncController: UIViewController {
     
     // sample item count for two swipe view
-    private let sampleCount: Int = 10
-    private let kMultiTag: Int = 100
-    private let kFullTag: Int = 101
+    fileprivate let sampleCount: Int = 10
+    fileprivate let kMultiTag: Int = 100
+    fileprivate let kFullTag: Int = 101
     
-    private var currentMultiView: UILabel?
-    private var currentFullView: UILabel?
+    fileprivate var currentMultiView: UILabel?
+    fileprivate var currentFullView: UILabel?
     
     // where multi swipe view will be placed
-    private var multiViewRect: CGRect {
-        return CGRectMake(0, 64, self.view.frame.size.width, 50)
+    fileprivate var multiViewRect: CGRect {
+        return CGRect(x: 0, y: 64, width: self.view.frame.size.width, height: 50)
     }
-    private var multiItemSize: CGSize {
+    fileprivate var multiItemSize: CGSize {
         return CGSize(width: 100, height: multiViewRect.height)
     }
     
     // where full swipe view will be placed
-    private var fullViewRect: CGRect {
-        return CGRectMake(
-            0,
-            multiViewRect.origin.y + multiViewRect.height,
-            self.view.frame.size.width,
-            self.view.frame.size.height - (multiViewRect.origin.y + multiViewRect.height))
+    fileprivate var fullViewRect: CGRect {
+        return CGRect(
+            x: 0,
+            y: multiViewRect.origin.y + multiViewRect.height,
+            width: self.view.frame.size.width,
+            height: self.view.frame.size.height - (multiViewRect.origin.y + multiViewRect.height))
     }
-    private var fullItemSize: CGSize {
+    fileprivate var fullItemSize: CGSize {
         return CGSize(width: self.view.frame.size.width, height: fullViewRect.height)
     }
     
-    private var swipeViewMulti: HFSwipeView!
-    private var swipeViewFull: HFSwipeView!
+    fileprivate var swipeViewMulti: HFSwipeView!
+    fileprivate var swipeViewFull: HFSwipeView!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -67,9 +67,9 @@ class SyncController: UIViewController {
         swipeViewFull.delegate = self
         swipeViewFull.tag = kFullTag
         swipeViewFull.recycleEnabled = true
-        swipeViewFull.currentPageIndicatorTintColor = UIColor.blackColor()
-        swipeViewFull.pageIndicatorTintColor = UIColor.lightGrayColor()
-        swipeViewFull.backgroundColor = UIColor.clearColor()
+        swipeViewFull.currentPageIndicatorTintColor = .black
+        swipeViewFull.pageIndicatorTintColor = .lightGray
+        swipeViewFull.backgroundColor = .clear
         self.view.addSubview(self.swipeViewFull!)
         
         swipeViewFull.syncView = swipeViewMulti
@@ -85,78 +85,78 @@ class SyncController: UIViewController {
 
 // MARK: - HFSwipeViewDataSource
 extension SyncController: HFSwipeViewDataSource {
-    func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize {
+    func swipeViewItemSize(_ swipeView: HFSwipeView) -> CGSize {
         if swipeView.tag == kMultiTag {
             return multiItemSize
         } else {
             return fullItemSize
         }
     }
-    func swipeViewItemCount(swipeView: HFSwipeView) -> Int {
+    func swipeViewItemCount(_ swipeView: HFSwipeView) -> Int {
         if swipeView.tag == kMultiTag {
             return sampleCount
         } else {
             return sampleCount
         }
     }
-    func swipeView(swipeView: HFSwipeView, viewForIndexPath indexPath: NSIndexPath) -> UIView {
+    func swipeView(_ swipeView: HFSwipeView, viewForIndexPath indexPath: IndexPath) -> UIView {
         
         var view: UIView!
         switch swipeView.tag {
         case kFullTag:
-            let fullLabel = UILabel(frame: CGRect(origin: CGPointZero, size: fullItemSize))
+            let fullLabel = UILabel(frame: CGRect(origin: .zero, size: fullItemSize))
             fullLabel.text = "\(indexPath.row)"
-            fullLabel.textAlignment = .Center
+            fullLabel.textAlignment = .center
             view = fullLabel
         case kMultiTag:
             // inner view with size
-            let contentLabel = UILabel(frame: CGRect(origin: CGPoint.zero, size: multiItemSize))
+            let contentLabel = UILabel(frame: CGRect(origin: .zero, size: multiItemSize))
             contentLabel.text = "\(indexPath.row)"
-            contentLabel.textAlignment = .Center
+            contentLabel.textAlignment = .center
             view = contentLabel
         default:
             assertionFailure("unknown tag: \(swipeView.tag)")
         }
-        view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return view
     }
-    func swipeView(swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: IndexPath, view: UIView) {
         if let label = view as? UILabel {
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: UIColor.blackColor())
-            label.superview?.setBorder(1, color: UIColor.blackColor())
+            label.setBorder(0.5, color: UIColor.black)
+            label.superview?.setBorder(1, color: UIColor.black)
         } else {
             assertionFailure("failed to retrieve button for index: \(indexPath.row)")
         }
     }
-    func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: IndexPath, view: UIView) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
         if swipeView.tag == kMultiTag {
-            currentMultiView?.setBorder(0.5, color: UIColor.blackColor())
+            currentMultiView?.setBorder(0.5, color: UIColor.black)
             currentMultiView = view as? UILabel
             currentMultiView?.text = "\(indexPath.row)"
-            currentMultiView?.setBorder(1, color: UIColor.blueColor())
-            currentMultiView?.superview?.setBorder(1, color: UIColor.blackColor())
+            currentMultiView?.setBorder(1, color: UIColor.blue)
+            currentMultiView?.superview?.setBorder(1, color: UIColor.black)
         } else {
-            currentFullView?.setBorder(0.5, color: UIColor.blackColor())
+            currentFullView?.setBorder(0.5, color: UIColor.black)
             currentFullView = view as? UILabel
-            currentFullView?.setBorder(1, color: UIColor.blueColor())
-            currentFullView?.superview?.setBorder(1, color: UIColor.blackColor())
+            currentFullView?.setBorder(1, color: UIColor.blue)
+            currentFullView?.superview?.setBorder(1, color: UIColor.black)
         }
     }
 }
 
 // MARK: - HFSwipeViewDelegate
 extension SyncController: HFSwipeViewDelegate {
-    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath) {
+    func swipeView(_ swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: IndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath) {
+    func swipeView(_ swipeView: HFSwipeView, didSelectItemAtPath indexPath: IndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, changedView view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, didChangeIndexPath indexPath: IndexPath, changedView view: UIView) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
 }
