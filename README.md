@@ -23,6 +23,7 @@ N/A
 ## Version
 
 for Swift 2.#, refer to version 1.0.0
+
 after Swift 3.#, refer to development/master branch or last released version.
 
 ## Installation
