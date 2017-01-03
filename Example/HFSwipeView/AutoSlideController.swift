@@ -51,6 +51,10 @@ class AutoSlideController: UIViewController {
         self.swipeView.setBorder(0.5, color: .black)
     }
     
+    deinit {
+        swipeView.stopAutoSlide()
+    }
+    
     func updateCellView(_ view: UIView, indexPath: IndexPath, isCurrent: Bool) {
         
         if let label = view as? UILabel {

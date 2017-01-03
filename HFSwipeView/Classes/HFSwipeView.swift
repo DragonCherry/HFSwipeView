@@ -11,7 +11,7 @@ import UIKit
 // MARK: Common Utilities
 internal func printDetail(_ message: String) {
     #if DEBUG
-        print("(\(String(#file)):\(#line)) \(message)")
+        print("(\(#file):\(#line)) \(message)")
     #endif
 }
 
@@ -93,6 +93,9 @@ class HFSwipeViewFlowLayout: UICollectionViewFlowLayout {
 
 // MARK: - HFSwipeView
 open class HFSwipeView: UIView {
+    
+    // MARK: Development
+    fileprivate let isDebug: Bool = true
     
     // MARK: Private Constants
     fileprivate var kSwipeViewCellContentTag: Int!
@@ -316,7 +319,7 @@ open class HFSwipeView: UIView {
         }
         collectionLayout!.itemSize = itemSize
         collectionView!.contentSize = contentSize
-        collectionView!.reloadData()
+        collectionView!.collectionViewLayout.invalidateLayout()
         log("successfully set content size: \(collectionView!.contentSize)")
         
         return true
@@ -466,6 +469,34 @@ extension HFSwipeView {
 
 // MARK: - Private Methods: Offset Control
 extension HFSwipeView {
+    
+    fileprivate func addDebugInfo(view: UIView, realIndex: Int, dispIndex: Int) {
+        guard isDebug else { return }
+        
+        var realIndexLabel: UILabel!
+        var dispIndexLabel: UILabel!
+        
+        if let label = view.viewWithTag(0x5000) as? UILabel {
+            realIndexLabel = label
+        } else {
+            realIndexLabel = UILabel(frame: CGRect(x: 5, y: 5, width: 50, height: 20))
+            realIndexLabel.textColor = .black
+            realIndexLabel.tag = 0x5000
+            view.addSubview(realIndexLabel)
+        }
+        if let label = view.viewWithTag(0x5001) as? UILabel {
+            dispIndexLabel = label
+        } else {
+            dispIndexLabel = UILabel(frame: CGRect(x: 5, y: 25, width: 50, height: 20))
+            dispIndexLabel.textColor = .black
+            dispIndexLabel.tag = 0x5001
+            view.addSubview(dispIndexLabel)
+        }
+        
+        realIndexLabel.text = "\(realIndex)/\(realViewCount)"
+        dispIndexLabel.text = "\(dispIndex)/\(count)"
+    }
+    
     fileprivate func centerOffset() -> CGPoint {
         var center = self.collectionView!.contentOffset
         center.x += frame.size.width / 2
@@ -812,7 +843,6 @@ extension HFSwipeView {
             cellsText += "(\(cell.tag):\(ratio)) "
             magnifyCell(cell, forRatio: ratio)
         }
-        //        log("\(#function): \(cellsText)")
     }
     
     fileprivate func magnifyCell(_ cell: UICollectionViewCell, forRatio ratio: CGFloat) {
@@ -830,7 +860,6 @@ extension HFSwipeView {
             } else {
                 bonusRatio = (ratio + 1) * (bonusRatio - 1) + 1
             }
-            //            log("bonusRatio: \(bonusRatio)")
             
             let viewWidth = itemSize!.width * bonusRatio
             cellView.transform = CGAffineTransform(scaleX: bonusRatio, y: bonusRatio)
@@ -895,20 +924,24 @@ extension HFSwipeView: UICollectionViewDataSource {
         
         var cellView: UIView? = nil
         if recycleEnabled {
-            cellView = cell.contentView.viewWithTag(kSwipeViewCellContentTag)
+            if let view = cell.contentView.viewWithTag(kSwipeViewCellContentTag) {
+                cellView = view
+            } else {
+                // set cellView as newly created view
+                cellView = dataSource.swipeView(self, viewForIndexPath: displayIndex)
+                cellView!.tag = kSwipeViewCellContentTag
+                cell.contentView.addSubview(cellView!)
+            }
         } else {
             cell.contentView.viewWithTag(kSwipeViewCellContentTag)?.removeFromSuperview()
-        }
-        if cellView == nil {
-            // set cellView as newly created view
             cellView = dataSource.swipeView(self, viewForIndexPath: displayIndex)
             cellView!.tag = kSwipeViewCellContentTag
+            cell.contentView.addSubview(cellView!)
         }
         indexViewMapper[indexPath.row] = cellView
         
         // locate content view at center of given cell
         cellView!.frame.origin.x = itemSpace / 2
-        cell.contentView.addSubview(cellView!)
         
         if magnifyCenter {
             cell.tag = indexPath.row
@@ -917,11 +950,14 @@ extension HFSwipeView: UICollectionViewDataSource {
         
         if displayIndex.row == currentPage {
             log("\(#function)[CURRENT][\(displayIndex.row)/\(indexPath.row)]")
-            dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
+            if indexPath.row == currentRealPage {
+                dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
+            }
         } else {
             log("\(#function)[NORMAL][\(displayIndex.row)/\(indexPath.row)]")
             dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
         }
+        addDebugInfo(view: cellView!, realIndex: indexPath.row, dispIndex: displayIndex.row)
         return cell
     }
     
@@ -990,12 +1026,12 @@ extension HFSwipeView: UICollectionViewDelegateFlowLayout {
         
         guard var itemSize = self.itemSize else {
             loge("item size not provided")
-            return CGSize.zero
+            return .zero
         }
         
         if frame.size.width < itemSize.width {
             loge("item size cannot exceeds parent swipe view")
-            return CGSize.zero
+            return .zero
         }
         
         if circulating {
@@ -1007,6 +1043,8 @@ extension HFSwipeView: UICollectionViewDelegateFlowLayout {
                 itemSize.width += itemSpace
             }
         }
+        // locate content view at center of given cell
+        collectionView.cellForItem(at: indexPath)?.viewWithTag(kSwipeViewCellContentTag)?.frame.origin.x = itemSpace / 2
         return itemSize
     }
     
@@ -1023,11 +1061,11 @@ extension HFSwipeView: UICollectionViewDelegateFlowLayout {
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize.zero
+        return .zero
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        return CGSize.zero
+        return .zero
     }
 }
 
