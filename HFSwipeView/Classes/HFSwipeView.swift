@@ -1089,7 +1089,7 @@ extension HFSwipeView: UIScrollViewDelegate {
         }
         
         if circulating {
-            scrollViewFixOffset(scrollView)
+            _ = scrollViewFixOffset(scrollView)
             postSync(scrollView.contentOffset, contentSize: scrollView.contentSize)
         }
         
