@@ -95,7 +95,7 @@ class HFSwipeViewFlowLayout: UICollectionViewFlowLayout {
 open class HFSwipeView: UIView {
     
     // MARK: Development
-    fileprivate let isDebug: Bool = true
+    fileprivate let isDebug: Bool = false
     
     // MARK: Private Constants
     fileprivate var kSwipeViewCellContentTag: Int!
@@ -481,6 +481,7 @@ extension HFSwipeView {
         } else {
             realIndexLabel = UILabel(frame: CGRect(x: 5, y: 5, width: 50, height: 20))
             realIndexLabel.textColor = .black
+            realIndexLabel.font = .systemFont(ofSize: 8)
             realIndexLabel.tag = 0x5000
             view.addSubview(realIndexLabel)
         }
@@ -489,6 +490,7 @@ extension HFSwipeView {
         } else {
             dispIndexLabel = UILabel(frame: CGRect(x: 5, y: 25, width: 50, height: 20))
             dispIndexLabel.textColor = .black
+            dispIndexLabel.font = .systemFont(ofSize: 8)
             dispIndexLabel.tag = 0x5001
             view.addSubview(dispIndexLabel)
         }
