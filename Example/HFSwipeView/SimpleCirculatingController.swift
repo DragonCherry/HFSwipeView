@@ -11,14 +11,15 @@ import HFSwipeView
 
 class SimpleCirculatingController: UIViewController {
     
-    private let sampleCount: Int = 5
-    private var swipeView: HFSwipeView!
-    private var currentView: UIView?
-    private var itemSize: CGSize {
-        return CGSizeMake(100, 100)
+    fileprivate let sampleCount: Int = 5
+    fileprivate var swipeView: HFSwipeView!
+    fileprivate var currentIndex: Int = 0
+    fileprivate var currentView: UIView?
+    fileprivate var itemSize: CGSize {
+        return CGSize(width: 100, height: 100)
     }
-    private var swipeViewFrame: CGRect {
-        return CGRectMake(0, 100, view.frame.size.width, 100)
+    fileprivate var swipeViewFrame: CGRect {
+        return CGRect(x: 0, y: 100, width: view.frame.size.width, height: 100)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -42,25 +43,27 @@ class SimpleCirculatingController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         self.swipeView.frame = swipeViewFrame
-        self.swipeView.setBorder(0.5, color: .blackColor())
+        self.swipeView.setBorder(0.5, color: .black)
     }
     
-    func updateCellView(view: UIView, indexPath: NSIndexPath, isCurrent: Bool) {
+    func updateCellView(_ view: UIView, indexPath: IndexPath, isCurrent: Bool) {
         
         if let label = view as? UILabel {
-            
             if isCurrent {
-                // old view
-                currentView?.backgroundColor = .whiteColor()
+                if label != currentView {
+                    currentView?.backgroundColor = .clear
+                }
+                label.backgroundColor = .yellow
                 currentView = label
-                currentView?.backgroundColor = .yellowColor()
+                currentIndex = indexPath.row
             } else {
-                label.backgroundColor = .whiteColor()
+                label.backgroundColor = .clear
             }
-            label.textAlignment = .Center
+            label.textAlignment = .center
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: .blackColor())
+            label.setBorder(0.5, color: .black)
             
+            print("\(#function): [\(indexPath.row)] -> isCurrent: \(isCurrent)")
         } else {
             assertionFailure("failed to retrieve UILabel for index: \(indexPath.row)")
         }
@@ -69,34 +72,37 @@ class SimpleCirculatingController: UIViewController {
 
 // MARK: - HFSwipeViewDelegate
 extension SimpleCirculatingController: HFSwipeViewDelegate {
-    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath) {
+    func swipeView(_ swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: IndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath) {
+    func swipeView(_ swipeView: HFSwipeView, didSelectItemAtPath indexPath: IndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, changedView view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, didChangeIndexPath indexPath: IndexPath, changedView view: UIView) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
 }
 
 // MARK: - HFSwipeViewDataSource
 extension SimpleCirculatingController: HFSwipeViewDataSource {
-    func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize {
+    func swipeViewItemSize(_ swipeView: HFSwipeView) -> CGSize {
         return itemSize
     }
-    func swipeViewItemCount(swipeView: HFSwipeView) -> Int {
+    func swipeViewItemCount(_ swipeView: HFSwipeView) -> Int {
         return sampleCount
     }
-    func swipeView(swipeView: HFSwipeView, viewForIndexPath indexPath: NSIndexPath) -> UIView {
-        return UILabel(frame: CGRect(origin: CGPointZero, size: itemSize))
+    func swipeView(_ swipeView: HFSwipeView, viewForIndexPath indexPath: IndexPath) -> UIView {
+        print("\(#function): [\(indexPath.row)]")
+        return UILabel(frame: CGRect(origin: .zero, size: itemSize))
     }
-    func swipeView(swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: IndexPath, view: UIView) {
+        print("\(#function): [\(indexPath.row)]")
         updateCellView(view, indexPath: indexPath, isCurrent: false)
     }
-    func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: IndexPath, view: UIView) {
+        print("\(#function): [\(indexPath.row)]")
         updateCellView(view, indexPath: indexPath, isCurrent: true)
     }
 }

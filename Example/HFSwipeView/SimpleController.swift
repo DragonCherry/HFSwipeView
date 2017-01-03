@@ -11,14 +11,14 @@ import HFSwipeView
 
 class SimpleController: UIViewController {
     
-    private let sampleCount: Int = 10
-    private var swipeView: HFSwipeView!
-    private var currentView: UIView?
-    private var itemSize: CGSize {
-        return CGSizeMake(100, 100)
+    fileprivate let sampleCount: Int = 10
+    fileprivate var swipeView: HFSwipeView!
+    fileprivate var currentView: UIView?
+    fileprivate var itemSize: CGSize {
+        return CGSize(width: 100, height: 100)
     }
-    private var swipeViewFrame: CGRect {
-        return CGRectMake(0, 100, self.view.frame.size.width, 100)
+    fileprivate var swipeViewFrame: CGRect {
+        return CGRect(x: 0, y: 100, width: self.view.frame.size.width, height: 100)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -43,21 +43,21 @@ class SimpleController: UIViewController {
         self.swipeView!.frame = swipeViewFrame
     }
     
-    func updateCellView(view: UIView, indexPath: NSIndexPath, isCurrent: Bool) {
+    func updateCellView(_ view: UIView, indexPath: IndexPath, isCurrent: Bool) {
         
         if let label = view as? UILabel {
             
-            label.backgroundColor = isCurrent ? .yellowColor() : .whiteColor()
+            label.backgroundColor = isCurrent ? .yellow : .white
             
             if isCurrent {
                 // old view
-                currentView?.backgroundColor = .whiteColor()
+                currentView?.backgroundColor = .white
                 currentView = label
             }
             
-            label.textAlignment = .Center
+            label.textAlignment = .center
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: .blackColor())
+            label.setBorder(0.5, color: .black)
             
             
             
@@ -69,34 +69,34 @@ class SimpleController: UIViewController {
 
 // MARK: - HFSwipeViewDelegate
 extension SimpleController: HFSwipeViewDelegate {
-    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath) {
+    func swipeView(_ swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: IndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath) {
+    func swipeView(_ swipeView: HFSwipeView, didSelectItemAtPath indexPath: IndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, changedView view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, didChangeIndexPath indexPath: IndexPath, changedView view: UIView) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
 }
 
 // MARK: - HFSwipeViewDataSource
 extension SimpleController: HFSwipeViewDataSource {
-    func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize {
+    func swipeViewItemSize(_ swipeView: HFSwipeView) -> CGSize {
         return itemSize
     }
-    func swipeViewItemCount(swipeView: HFSwipeView) -> Int {
+    func swipeViewItemCount(_ swipeView: HFSwipeView) -> Int {
         return sampleCount
     }
-    func swipeView(swipeView: HFSwipeView, viewForIndexPath indexPath: NSIndexPath) -> UIView {
-        return UILabel(frame: CGRect(origin: CGPointZero, size: itemSize))
+    func swipeView(_ swipeView: HFSwipeView, viewForIndexPath indexPath: IndexPath) -> UIView {
+        return UILabel(frame: CGRect(origin: .zero, size: itemSize))
     }
-    func swipeView(swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: IndexPath, view: UIView) {
         updateCellView(view, indexPath: indexPath, isCurrent: false)
     }
-    func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: IndexPath, view: UIView) {
         updateCellView(view, indexPath: indexPath, isCurrent: true)
     }
 }

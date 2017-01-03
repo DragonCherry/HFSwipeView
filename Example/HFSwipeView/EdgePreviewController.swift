@@ -12,22 +12,22 @@ import HFSwipeView
 class EdgePreviewController: UIViewController {
     
     // sample item count for two swipe view
-    private let sampleCount: Int = 10
-    private var currentFullView: UILabel?
+    fileprivate let sampleCount: Int = 10
+    fileprivate var currentFullView: UILabel?
     
     // where full swipe view will be placed
-    private var fullViewRect: CGRect {
-        return CGRectMake(
-            0,
-            100,
-            self.view.frame.size.width,
-            self.view.frame.size.width)
+    fileprivate var fullViewRect: CGRect {
+        return CGRect(
+            x: 0,
+            y: 100,
+            width: self.view.frame.size.width,
+            height: self.view.frame.size.width)
     }
-    private var fullItemSize: CGSize {
+    fileprivate var fullItemSize: CGSize {
         return CGSize(width: self.view.frame.size.width - 70, height: self.view.frame.size.width)
     }
     
-    private var swipeView: HFSwipeView!
+    fileprivate var swipeView: HFSwipeView!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -44,57 +44,57 @@ class EdgePreviewController: UIViewController {
         swipeView.delegate = self
         swipeView.recycleEnabled = true
         swipeView.currentPage = 0
-        swipeView.currentPageIndicatorTintColor = UIColor.blackColor()
-        swipeView.pageIndicatorTintColor = UIColor.lightGrayColor()
-        swipeView.backgroundColor = UIColor.clearColor()
+        swipeView.currentPageIndicatorTintColor = UIColor.black
+        swipeView.pageIndicatorTintColor = UIColor.lightGray
+        swipeView.backgroundColor = UIColor.clear
         self.view.addSubview(self.swipeView)
     }
 }
 
 // MARK: - HFSwipeViewDataSource
 extension EdgePreviewController: HFSwipeViewDataSource {
-    func swipeViewItemDistance(swipeView: HFSwipeView) -> CGFloat {
+    func swipeViewItemDistance(_ swipeView: HFSwipeView) -> CGFloat {
         return 15
     }
-    func swipeViewItemSize(swipeView: HFSwipeView) -> CGSize {
+    func swipeViewItemSize(_ swipeView: HFSwipeView) -> CGSize {
         return fullItemSize
     }
-    func swipeViewItemCount(swipeView: HFSwipeView) -> Int {
+    func swipeViewItemCount(_ swipeView: HFSwipeView) -> Int {
         return sampleCount
     }
-    func swipeView(swipeView: HFSwipeView, viewForIndexPath indexPath: NSIndexPath) -> UIView {
-        let fullLabel = UILabel(frame: CGRect(origin: CGPointZero, size: fullItemSize))
+    func swipeView(_ swipeView: HFSwipeView, viewForIndexPath indexPath: IndexPath) -> UIView {
+        let fullLabel = UILabel(frame: CGRect(origin: .zero, size: fullItemSize))
         fullLabel.text = "\(indexPath.row)"
-        fullLabel.textAlignment = .Center
+        fullLabel.textAlignment = .center
         return fullLabel
     }
-    func swipeView(swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: IndexPath, view: UIView) {
         if let label = view as? UILabel {
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: UIColor.blackColor())
+            label.setBorder(0.5, color: UIColor.black)
         } else {
             assertionFailure("failed to retrieve button for index: \(indexPath.row)")
         }
     }
-    func swipeView(swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: NSIndexPath, view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: IndexPath, view: UIView) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
-        currentFullView?.setBorder(0.5, color: UIColor.blackColor())
+        currentFullView?.setBorder(0.5, color: UIColor.black)
         currentFullView = view as? UILabel
-        currentFullView?.setBorder(1, color: UIColor.blueColor())
+        currentFullView?.setBorder(1, color: UIColor.blue)
     }
 }
 
 // MARK: - HFSwipeViewDelegate
 extension EdgePreviewController: HFSwipeViewDelegate {
-    func swipeView(swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: NSIndexPath) {
+    func swipeView(_ swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: IndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didSelectItemAtPath indexPath: NSIndexPath) {
+    func swipeView(_ swipeView: HFSwipeView, didSelectItemAtPath indexPath: IndexPath) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
-    func swipeView(swipeView: HFSwipeView, didChangeIndexPath indexPath: NSIndexPath, changedView view: UIView) {
+    func swipeView(_ swipeView: HFSwipeView, didChangeIndexPath indexPath: IndexPath, changedView view: UIView) {
         NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
 }
