@@ -7,27 +7,9 @@
 //
 
 import UIKit
+import TinyLog
 
 // MARK: Common Utilities
-internal func printDetail(_ message: String) {
-    #if DEBUG
-        print("(\(#file):\(#line)) \(message)")
-    #endif
-}
-
-internal func log(_ message: String?) {
-    #if DEBUG
-        if let message = message {
-            print(message)
-        } else {
-            printDetail("nil message")
-        }
-    #endif
-}
-
-internal func loge(_ message: String?) { printDetail("[Error]: \(message)") }
-internal func loge(_ error: Error?) { printDetail("[Error]: \(error)") }
-internal func logw(_ message: String?) { printDetail("[Warning]: \(message)") }
 internal func integer(_ object: AnyObject?, defaultValue: Int = 0) -> Int {
     if let number = object as? NSNumber {
         return number.intValue
