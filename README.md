@@ -18,7 +18,7 @@ Any advice and suggestions will be greatly appreciated.
 
 ## Requirements
 
-N/A
+Xcode8, Swift 3
 
 ## Version
 
