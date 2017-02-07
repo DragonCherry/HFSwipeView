@@ -16,6 +16,20 @@ A swipe view loops through multiple view items infinitely, with UIPageControl at
 
 Any advice and suggestions will be greatly appreciated.
 
+## Features
+
+- supports infinite circulating swipe view
+
+- supports auto-align selected cell on center of the view
+
+- supports sync mode between two HFSwipeView(normally used for categorized header/content view)
+
+- supports auto-slide(in circulating mode only) based on given NSTimeInterval, you can use it like banner-style view.
+
+- supports magnifying mode(magnifies selected-center cell)
+
+- supports auto shrinking UIPageControl at the bottom area of the HFSwipeView
+
 ## Requirements
 
 Xcode8, Swift 3
