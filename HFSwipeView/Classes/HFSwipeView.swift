@@ -86,6 +86,7 @@ open class HFSwipeView: UIView {
     fileprivate let kPageControlHorizontalPadding: CGFloat = 10
     
     // MARK: Private Variables
+    fileprivate var isRtl: Bool = false
     fileprivate var initialized: Bool = false
     fileprivate var itemSize: CGSize? = nil
     fileprivate var itemSpace: CGFloat = 0
@@ -124,14 +125,14 @@ open class HFSwipeView: UIView {
     
     // MARK: Public Properties
     open var currentPage: Int = -1
-    open var collectionView: UICollectionView?
+    open var collectionView: UICollectionView!
     
     open var collectionBackgroundColor: UIColor? {
         set {
-            collectionView!.backgroundView?.backgroundColor = newValue
+            collectionView.backgroundView?.backgroundColor = newValue
         }
         get {
-            return collectionView!.backgroundView?.backgroundColor
+            return collectionView.backgroundView?.backgroundColor
         }
     }
     
@@ -203,6 +204,9 @@ open class HFSwipeView: UIView {
     
     fileprivate func commonInit() {
         kSwipeViewCellContentTag = self.hash
+        if let languageCode = NSLocale.current.languageCode {
+            isRtl = NSLocale.characterDirection(forLanguage: languageCode) == .rightToLeft
+        }
         loadViews()
     }
     
@@ -234,7 +238,7 @@ open class HFSwipeView: UIView {
         view.showsVerticalScrollIndicator = false
         view.decelerationRate = UIScrollViewDecelerationRateFast
         collectionView = view
-        addSubview(collectionView!)
+        addSubview(collectionView)
         
         // page control
         pageControl = UIPageControl()
@@ -244,7 +248,7 @@ open class HFSwipeView: UIView {
     fileprivate func prepareForInteraction() {
         applyMagnifyCenter()
         initialized = true
-        collectionView!.isUserInteractionEnabled = true
+        collectionView.isUserInteractionEnabled = true
     }
     
     fileprivate func calculate() -> Bool {
@@ -289,7 +293,7 @@ open class HFSwipeView: UIView {
             log("successfully set realViewCount: \(realViewCount)")
             
         } else {
-            collectionView!.alwaysBounceHorizontal = true
+            collectionView.alwaysBounceHorizontal = true
             realViewCount = itemCount
         }
         
@@ -300,9 +304,9 @@ open class HFSwipeView: UIView {
             contentSize.width = ceil((itemSize.width + itemSpace) * CGFloat(itemCount + dummyCount * 2) - itemSpace)
         }
         collectionLayout!.itemSize = itemSize
-        collectionView!.contentSize = contentSize
-        collectionView!.collectionViewLayout.invalidateLayout()
-        log("successfully set content size: \(collectionView!.contentSize)")
+        collectionView.contentSize = contentSize
+        collectionView.collectionViewLayout.invalidateLayout()
+        log("successfully set content size: \(collectionView.contentSize)")
         
         return true
     }
@@ -315,7 +319,7 @@ extension HFSwipeView {
     
     public func layoutViews() {
         
-        log("\(type(of: self)) - \(#function)")
+        log("\(type(of: self)) - ")
         
         initialized = false
         
@@ -325,7 +329,7 @@ extension HFSwipeView {
         // calculate for view presentation
         if calculate() {
             if let itemSize = self.itemSize {
-                collectionView!.frame.size = CGSize(width: frame.size.width, height: itemSize.height)
+                collectionView.frame.size = CGSize(width: frame.size.width, height: itemSize.height)
             }
         }
         
@@ -352,12 +356,12 @@ extension HFSwipeView {
                     currentRealPage = dummyCount
                 }
                 let offset = centeredOffsetForIndex(IndexPath(item: currentRealPage < 0 ? dummyCount : currentRealPage, section: 0))
-                collectionView!.setContentOffset(offset, animated: false)
+                collectionView.setContentOffset(offset, animated: false)
             } else {
                 currentPage = 0
                 currentRealPage = 0
                 let offset = centeredOffsetForIndex(IndexPath(item: currentRealPage < 0 ? 0 : currentRealPage, section: 0))
-                collectionView!.setContentOffset(offset, animated: false)
+                collectionView.setContentOffset(offset, animated: false)
             }
         }
         prepareForInteraction()
@@ -367,7 +371,7 @@ extension HFSwipeView {
         
         if page == currentPage {
             log("movePage received same page(\(page)) == currentPage(\(currentPage))")
-            autoAlign(collectionView!, indexPath: IndexPath(item: currentRealPage, section: 0))
+            autoAlign(collectionView, indexPath: IndexPath(item: currentRealPage, section: 0))
             return
         }
         let displayIndex = IndexPath(item: page, section: 0)
@@ -382,11 +386,22 @@ extension HFSwipeView {
 
 
 
+// MARK: - RTL Related Utilities
+extension HFSwipeView {
+    fileprivate func flippedX(_ x: CGFloat) -> CGFloat {
+        if isRtl {
+            return collectionView.contentSize.width - frame.size.width - x
+        }
+        return x
+    }
+}
+
+
 // MARK: - Public APIs: Auto Slide
 extension HFSwipeView {
     /// zero or minus interval disables auto slide.
     public func startAutoSlideForTimeInterval(_ interval: TimeInterval) {
-        log("\(#function)")
+        log("")
         if !circulating {
             logw("Cannot use auto-slide without circulation mode.")
             return
@@ -404,7 +419,7 @@ extension HFSwipeView {
     }
     
     public func pauseAutoSlide() {
-        log("\(#function)")
+        log("")
         if !circulating {
             logw("Cannot use auto-slide without circulation mode.")
             return
@@ -418,7 +433,7 @@ extension HFSwipeView {
     }
     
     public func resumeAutoSlide() {
-        log("\(#function)")
+        log("")
         if !circulating {
             logw("Cannot use auto-slide without circulation mode.")
             return
@@ -429,7 +444,7 @@ extension HFSwipeView {
     }
     
     public func stopAutoSlide() {
-        log("\(#function)")
+        log("")
         if !circulating {
             logw("Cannot use auto-slide without circulation mode.")
             return
@@ -482,7 +497,7 @@ extension HFSwipeView {
     }
     
     fileprivate func centerOffset() -> CGPoint {
-        var center = self.collectionView!.contentOffset
+        var center = self.collectionView.contentOffset
         center.x += frame.size.width / 2
         return center
     }
@@ -500,13 +515,13 @@ extension HFSwipeView {
             if newX < 0 {
                 newX = 0
             }
-            if newX > collectionView!.contentSize.width - frame.size.width {
-                newX = collectionView!.contentSize.width - frame.size.width
+            if newX > collectionView.contentSize.width - frame.size.width {
+                newX = collectionView.contentSize.width - frame.size.width
             }
         }
         
         // corrected index
-        let centeredOffset = CGPoint(x: newX, y: collectionView!.frame.origin.y)
+        let centeredOffset = CGPoint(x: flippedX(newX), y: collectionView.frame.origin.y)
         return centeredOffset
     }
     
@@ -524,7 +539,7 @@ extension HFSwipeView {
         } else {
             let centeredOffset = centeredOffsetForIndex(proposedIndexPath)
             let centeredIndexPath = indexPathForItemAtPoint(centeredOffset)
-            let currentIndex = integer(indexPathForItemAtPoint(CGPoint(x: collectionView!.contentOffset.x, y: 0))?.row as AnyObject?)
+            let currentIndex = integer(indexPathForItemAtPoint(CGPoint(x: collectionView.contentOffset.x, y: 0))?.row as AnyObject?)
             if integer(centeredIndexPath?.row as AnyObject?) == currentIndex {
                 if velocity.x < 0 {
                     return centeredOffsetForIndex(IndexPath(item: currentIndex - 1, section: 0))
@@ -540,9 +555,9 @@ extension HFSwipeView {
     }
     
     fileprivate func setContentOffsetWithoutCallingDelegate(_ offset: CGPoint) {
-        collectionView!.delegate = nil
-        collectionView!.contentOffset = offset
-        collectionView!.delegate = self
+        collectionView.delegate = nil
+        collectionView.contentOffset = CGPoint(x: flippedX(offset.x), y: offset.y)
+        collectionView.delegate = self
     }
     
     fileprivate func updateIndexBasedOnContentOffset() {
@@ -551,7 +566,7 @@ extension HFSwipeView {
             return
         }
         
-        guard let indexPath = indexPathForItemAtPoint(collectionView!.contentOffset) else {
+        guard let indexPath = indexPathForItemAtPoint(collectionView.contentOffset) else {
             logw("indexPathForItemAtPoint returned nil.")
             return
         }
@@ -570,7 +585,7 @@ extension HFSwipeView {
             } else {
                 logw("Failed to retrieve current view from indexViewMapper for indexPath: \(indexPath.row)")
             }
-            log("\(#function)[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
+            log("[\(self.tag)]: \(currentPage)/\(count - 1) - \(currentRealPage)/\(realViewCount - 1)")
         }
     }
     
@@ -580,12 +595,12 @@ extension HFSwipeView {
         if offset.x < dummyWidth {
             let delta = dummyWidth - offset.x
             setContentOffsetWithoutCallingDelegate(CGPoint(x: contentSize.width - dummyWidth - delta, y: 0))
-            log("\(#function)[\(self.tag)]: moved to last view, offset: \(scrollView.contentOffset)")
+            log("[\(self.tag)]: moved to last view, offset: \(scrollView.contentOffset)")
             return true
         } else if offset.x >= contentSize.width - dummyWidth {
             let delta = offset.x - (contentSize.width - dummyWidth)
             setContentOffsetWithoutCallingDelegate(CGPoint(x: self.dummyWidth + delta, y: 0))
-            log("\(#function)[\(self.tag)]: moved to first view!, offset: \(scrollView.contentOffset)")
+            log("[\(self.tag)]: moved to first view!, offset: \(scrollView.contentOffset)")
             return true
         }
         return false
@@ -641,27 +656,27 @@ extension HFSwipeView {
             }
             index += 1
         }
-        log("\(#function)[\(self.tag)]: from: \(from) to: \(minIdx)")
+        log("[\(self.tag)]: from: \(from) to: \(minIdx)")
         return IndexPath(item: minIdx, section: 0)
     }
     
     fileprivate func indexPathForItemAtPoint(_ offset: CGPoint) -> IndexPath? {
         
-        let rightEdge = collectionView!.contentOffset.x + collectionView!.frame.size.width
+        let rightEdge = collectionView.contentOffset.x + collectionView.frame.size.width
         var index: IndexPath? = nil
         let center = centerOffset()
         
         if offset.x < 0 {
             // left edge
             index = IndexPath(row: 0, section: 0)
-        } else if rightEdge > collectionView!.contentSize.width {
+        } else if rightEdge > collectionView.contentSize.width {
             // right edge
             index = IndexPath(row: count - 1, section: 0)
         } else {
             // between both side
-            index = collectionView!.indexPathForItem(at: center)
+            index = collectionView.indexPathForItem(at: center)
         }
-//        log("center = \(center), size = \(collectionView!.contentSize), offset: \(collectionView!.contentOffset), index: \(index?.row)")
+//        log("center = \(center), size = \(collectionView.contentSize), offset: \(collectionView.contentOffset), index: \(index?.row)")
         return index
     }
     
@@ -675,7 +690,7 @@ extension HFSwipeView {
             } else {
                 displayIndex = realIndex.row - count - dummyCount
             }
-            //            log("\(#function)[\(self.tag)]: \(realIndex.row) -> \(displayIndex)")
+            log("[\(self.tag)]: \(realIndex.row) -> \(displayIndex)")
             return IndexPath(item: displayIndex, section: 0)
         } else {
             return IndexPath(item: realIndex.row, section: 0)
@@ -690,7 +705,7 @@ extension HFSwipeView {
         if 0 <= displayIndex.row && displayIndex.row < count {
             index = displayIndex.row + dummyCount
         }
-        log("\(#function)[\(self.tag)]: \(displayIndex.row) -> \(index)")
+        log("[\(self.tag)]: \(displayIndex.row) -> \(index)")
         return IndexPath(item: index, section: 0)
     }
     
@@ -726,13 +741,13 @@ extension HFSwipeView {
             log("moveRealPage received same page(\(realPage)) == currentPage(\(currentRealPage))")
             return
         }
-        log("\(#function)[\(self.tag)]: \(realPage)")
+        log("[\(self.tag)]: \(realPage)")
         
         let realIndex = IndexPath(item: realPage, section: 0)
         
         if autoAlignEnabled {
             let offset = centeredOffsetForIndex(realIndex)
-            collectionView!.setContentOffset(offset, animated: animated)
+            collectionView.setContentOffset(offset, animated: animated)
         }
         
         if !circulating {
@@ -785,13 +800,13 @@ extension HFSwipeView {
             if !circulating {
                 let offset = scrollView.contentOffset
                 if offset.x > 0 && offset.x < scrollView.contentSize.width - frame.size.width {
-                    collectionView!.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+                    collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
                 }
             } else {
-                collectionView!.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+                collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
             }
         }
-        log("\(#function)[\(self.tag)]: real -> \(indexPath.row)")
+        log("[\(self.tag)]: real -> \(indexPath.row)")
     }
 }
 
@@ -803,8 +818,8 @@ extension HFSwipeView {
             return
         }
         
-        let left = self.collectionView!.contentOffset.x + itemSize!.width / 2
-        let right = self.collectionView!.contentOffset.x + frame.size.width - itemSize!.width / 2
+        let left = self.collectionView.contentOffset.x + itemSize!.width / 2
+        let right = self.collectionView.contentOffset.x + frame.size.width - itemSize!.width / 2
         let center = centerOffset().x
         let ratio = centerRatio(left, right: right, center: center, cell: cell)
         
@@ -815,11 +830,11 @@ extension HFSwipeView {
         if !magnifyCenter {
             return
         }
-        let cells = collectionView!.visibleCells
+        let cells = collectionView.visibleCells
         var cellsText = ""
         
-        let left = self.collectionView!.contentOffset.x + itemSize!.width / 2
-        let right = self.collectionView!.contentOffset.x + frame.size.width - itemSize!.width / 2
+        let left = self.collectionView.contentOffset.x + itemSize!.width / 2
+        let right = self.collectionView.contentOffset.x + frame.size.width - itemSize!.width / 2
         let center = centerOffset().x
         
         for cell in cells {
@@ -884,7 +899,7 @@ extension HFSwipeView: UICollectionViewDataSource {
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        log("\(#function): \(realViewCount)")
+        log(": \(realViewCount)")
         return realViewCount
     }
     
@@ -933,12 +948,12 @@ extension HFSwipeView: UICollectionViewDataSource {
         }
         
         if displayIndex.row == currentPage {
-            log("\(#function)[CURRENT][\(displayIndex.row)/\(indexPath.row)]")
+            log("[CURRENT][\(displayIndex.row)/\(indexPath.row)]")
             if indexPath.row == currentRealPage {
                 dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
             }
         } else {
-            log("\(#function)[NORMAL][\(displayIndex.row)/\(indexPath.row)]")
+            log("[NORMAL][\(displayIndex.row)/\(indexPath.row)]")
             dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
         }
         addDebugInfo(view: cellView!, realIndex: indexPath.row, dispIndex: displayIndex.row)
@@ -1080,11 +1095,11 @@ extension HFSwipeView: UIScrollViewDelegate {
     }
     
     public func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
-        log("\(#function)[\(self.tag)]")
+        log("[\(self.tag)]")
     }
     
     public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        log("\(#function)[\(self.tag)]: \(scrollView.contentOffset.x), velocity: \(velocity.x), target: \(targetContentOffset.pointee.x)")
+        log("[\(self.tag)]: \(scrollView.contentOffset.x), velocity: \(velocity.x), target: \(targetContentOffset.pointee.x)")
     }
     
     public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -1099,7 +1114,7 @@ extension HFSwipeView: UIScrollViewDelegate {
     }
     
     public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        log("\(#function)[\(self.tag)]")
+        log("[\(self.tag)]")
         updateIndexBasedOnContentOffset()
         
         if circulating {
@@ -1109,20 +1124,20 @@ extension HFSwipeView: UIScrollViewDelegate {
     
     fileprivate func finishScrolling() {
         
-        guard let indexPath = indexPathForItemAtPoint(collectionView!.contentOffset) else {
+        guard let indexPath = indexPathForItemAtPoint(collectionView.contentOffset) else {
             return
         }
-        log("\(#function)[\(self.tag)]: real -> \(indexPath.row)")
+        log("[\(self.tag)]: real -> \(indexPath.row)")
         
         let displayIndex = displayIndexUsing(indexPath)
         delegate?.swipeView?(self, didFinishScrollAtIndexPath: displayIndex)
         
         if circulating {
-            if !scrollViewFixOffset(collectionView!) {
-                autoAlign(collectionView!, indexPath: indexPath)
+            if !scrollViewFixOffset(collectionView) {
+                autoAlign(collectionView, indexPath: indexPath)
             }
         } else {
-            autoAlign(collectionView!, indexPath: indexPath)
+            autoAlign(collectionView, indexPath: indexPath)
         }
         
         if circulating {

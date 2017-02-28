@@ -11,7 +11,7 @@ import HFSwipeView
 
 class SimpleController: UIViewController {
     
-    fileprivate let sampleCount: Int = 10
+    fileprivate let sampleCount: Int = 4
     fileprivate var swipeView: HFSwipeView!
     fileprivate var currentView: UIView?
     fileprivate var itemSize: CGSize {
