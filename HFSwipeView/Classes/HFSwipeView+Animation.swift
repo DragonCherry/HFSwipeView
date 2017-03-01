@@ -18,7 +18,7 @@ extension HFSwipeView {
         
         let left = self.collectionView.contentOffset.x + itemSize!.width / 2
         let right = self.collectionView.contentOffset.x + frame.size.width - itemSize!.width / 2
-        let center = centerOffset().x
+        let center = centerOffset.x
         let ratio = centerRatio(left, right: right, center: center, cell: cell)
         
         magnifyCell(cell, forRatio: ratio)
@@ -33,7 +33,7 @@ extension HFSwipeView {
         
         let left = self.collectionView.contentOffset.x + itemSize!.width / 2
         let right = self.collectionView.contentOffset.x + frame.size.width - itemSize!.width / 2
-        let center = centerOffset().x
+        let center = centerOffset.x
         
         for cell in cells {
             let ratio = centerRatio(left, right: right, center: center, cell: cell)

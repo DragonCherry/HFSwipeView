@@ -11,15 +11,15 @@ import HFSwipeView
 
 class SimpleCirculatingController: UIViewController {
     
-    fileprivate let sampleCount: Int = 5
+    fileprivate let sampleCount: Int = 3
     fileprivate var swipeView: HFSwipeView!
     fileprivate var currentIndex: Int = 0
     fileprivate var currentView: UIView?
     fileprivate var itemSize: CGSize {
-        return CGSize(width: 100, height: 100)
+        return CGSize(width: 300, height: 200)
     }
     fileprivate var swipeViewFrame: CGRect {
-        return CGRect(x: 0, y: 100, width: view.frame.size.width, height: 100)
+        return CGRect(x: 37.5, y: 100, width: 300, height: 200)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -35,7 +35,9 @@ class SimpleCirculatingController: UIViewController {
         swipeView.circulating = true        // true: circulating mode
         swipeView.dataSource = self
         swipeView.delegate = self
-        swipeView.pageControlHidden = true
+        swipeView.pageControlHidden = false
+        swipeView.pageIndicatorTintColor = .gray
+        swipeView.currentPageIndicatorTintColor = .red
         swipeView.currentPage = 0
         view.addSubview(swipeView)
     }

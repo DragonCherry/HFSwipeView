@@ -64,26 +64,25 @@ extension HFSwipeView {
     internal func indexPathForItemAtPoint(_ offset: CGPoint) -> IndexPath? {
         
         if isRtl {
-            let leftEdge = collectionView.contentOffset.x + collectionView.frame.size.width
+            let rightEdge = collectionView.contentOffset.x + collectionView.frame.size.width
             var index: IndexPath? = nil
-            let center = centerOffset()
+            let center = centerOffset
             
             if offset.x < 0 {
                 // left edge
-                index = IndexPath(row: 0, section: 0)
-            } else if leftEdge > collectionView.contentSize.width {
-                // right edge
                 index = IndexPath(row: count - 1, section: 0)
+            } else if rightEdge > collectionView.contentSize.width {
+                // right edge
+                index = IndexPath(row: 0, section: 0)
             } else {
                 // between both side
                 index = collectionView.indexPathForItem(at: center)
             }
-//            log("center = \(center), size = \(collectionView.contentSize), offset: \(collectionView.contentOffset), index: \(index?.row)")
             return index
         } else {
             let rightEdge = collectionView.contentOffset.x + collectionView.frame.size.width
             var index: IndexPath? = nil
-            let center = centerOffset()
+            let center = centerOffset
             
             if offset.x < 0 {
                 // left edge
@@ -95,7 +94,6 @@ extension HFSwipeView {
                 // between both side
                 index = collectionView.indexPathForItem(at: center)
             }
-//            log("center = \(center), size = \(collectionView.contentSize), offset: \(collectionView.contentOffset), index: \(index?.row)")
             return index
         }
     }

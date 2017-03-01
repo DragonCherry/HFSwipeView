@@ -12,7 +12,7 @@ import TinyLog
 // MARK: - Private Methods: Offset Control
 extension HFSwipeView {
     
-    internal func centerOffset() -> CGPoint {
+    internal var centerOffset: CGPoint {
         var center = self.collectionView.contentOffset
         center.x += frame.size.width / 2
         return center
@@ -82,7 +82,7 @@ extension HFSwipeView {
     
     internal func setContentOffsetWithoutCallingDelegate(_ offset: CGPoint) {
         collectionView.delegate = nil
-        collectionView.contentOffset = CGPoint(x: flippedX(offset.x), y: offset.y)
+        collectionView.contentOffset = offset
         collectionView.delegate = self
     }
     
