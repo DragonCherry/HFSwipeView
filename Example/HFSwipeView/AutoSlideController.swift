@@ -8,6 +8,7 @@
 
 import UIKit
 import HFSwipeView
+import TinyLog
 
 class AutoSlideController: UIViewController {
     
@@ -80,15 +81,15 @@ class AutoSlideController: UIViewController {
 // MARK: - HFSwipeViewDelegate
 extension AutoSlideController: HFSwipeViewDelegate {
     func swipeView(_ swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: IndexPath) {
-        NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        log("HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
     func swipeView(_ swipeView: HFSwipeView, didSelectItemAtPath indexPath: IndexPath) {
-        NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        log("HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
     func swipeView(_ swipeView: HFSwipeView, didChangeIndexPath indexPath: IndexPath, changedView view: UIView) {
-        NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        log("HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
 }
 

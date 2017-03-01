@@ -198,7 +198,7 @@ extension HFSwipeView: UIScrollViewDelegate {
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
-        logd("\(scrollView.contentOffset)")
+//        logd("\(scrollView.contentOffset)")
         
         if !initialized || scrollView.contentSize.width <= 0 {
             // ignore invalid status
