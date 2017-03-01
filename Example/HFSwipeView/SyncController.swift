@@ -8,6 +8,7 @@
 
 import UIKit
 import HFSwipeView
+import TinyLog
 
 class SyncController: UIViewController {
     
@@ -130,7 +131,7 @@ extension SyncController: HFSwipeViewDataSource {
         }
     }
     func swipeView(_ swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: IndexPath, view: UIView) {
-        NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        log("HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
         if swipeView.tag == kMultiTag {
             currentMultiView?.setBorder(0.5, color: UIColor.black)
             currentMultiView = view as? UILabel
@@ -140,6 +141,7 @@ extension SyncController: HFSwipeViewDataSource {
         } else {
             currentFullView?.setBorder(0.5, color: UIColor.black)
             currentFullView = view as? UILabel
+            currentFullView?.text = "\(indexPath.row)"
             currentFullView?.setBorder(1, color: UIColor.blue)
             currentFullView?.superview?.setBorder(1, color: UIColor.black)
         }
@@ -149,14 +151,14 @@ extension SyncController: HFSwipeViewDataSource {
 // MARK: - HFSwipeViewDelegate
 extension SyncController: HFSwipeViewDelegate {
     func swipeView(_ swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: IndexPath) {
-        NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        log("HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
     func swipeView(_ swipeView: HFSwipeView, didSelectItemAtPath indexPath: IndexPath) {
-        NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        log("HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
     
     func swipeView(_ swipeView: HFSwipeView, didChangeIndexPath indexPath: IndexPath, changedView view: UIView) {
-        NSLog("\(#function): HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
+        log("HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
 }

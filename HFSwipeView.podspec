@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HFSwipeView'
-  s.version          = '1.1.2'
+  s.version          = '1.1.3'
   s.summary          = 'Infinite SwipeView for iOS.'
 
 # This description is used to generate tags and improve search results.
@@ -35,5 +35,6 @@ Pod::Spec.new do |s|
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   s.dependency 'TinyLog'
+  s.dependency 'PureLayout'
 
 end
