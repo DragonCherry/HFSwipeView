@@ -2,6 +2,7 @@ use_frameworks!
 
 target 'HFSwipeView_Example' do
   pod 'HFSwipeView', :path => '../'
+  pod 'TinyLog'
 end
 
 post_install do |installer|

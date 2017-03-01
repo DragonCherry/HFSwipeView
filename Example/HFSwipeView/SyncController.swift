@@ -8,6 +8,7 @@
 
 import UIKit
 import HFSwipeView
+import TinyLog
 
 class SyncController: UIViewController {
     
@@ -140,6 +141,7 @@ extension SyncController: HFSwipeViewDataSource {
         } else {
             currentFullView?.setBorder(0.5, color: UIColor.black)
             currentFullView = view as? UILabel
+            currentFullView?.text = "\(indexPath.row)"
             currentFullView?.setBorder(1, color: UIColor.blue)
             currentFullView?.superview?.setBorder(1, color: UIColor.black)
         }
