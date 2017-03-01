@@ -39,6 +39,7 @@ class EdgePreviewController: UIViewController {
         super.viewDidLoad()
         
         swipeView = HFSwipeView(frame: fullViewRect)
+        swipeView.isDebug = true
         swipeView.autoAlignEnabled = true
         swipeView.circulating = true
         swipeView.dataSource = self
@@ -81,6 +82,7 @@ extension EdgePreviewController: HFSwipeViewDataSource {
         log("HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
         currentFullView?.setBorder(0.5, color: UIColor.black)
         currentFullView = view as? UILabel
+        currentFullView?.text = "\(indexPath.row)"
         currentFullView?.setBorder(1, color: UIColor.blue)
     }
 }
