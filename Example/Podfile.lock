@@ -1,0 +1,19 @@
+PODS:
+  - HFSwipeView (1.1.2):
+    - TinyLog
+  - TinyLog (1.0.1)
+
+DEPENDENCIES:
+  - HFSwipeView (from `../`)
+
+EXTERNAL SOURCES:
+  HFSwipeView:
+    :path: ../
+
+SPEC CHECKSUMS:
+  HFSwipeView: 0f93ea537ee8c50b7d67eb432eb6cffda5c8241a
+  TinyLog: 6c3ecbc348d10dc242ebb506f684fc9ae6aff533
+
+PODFILE CHECKSUM: 4634ef381fba79e025e1531e7f33c2b1a87c2855
+
+COCOAPODS: 1.2.0
