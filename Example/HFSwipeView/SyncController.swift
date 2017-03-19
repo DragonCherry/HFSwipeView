@@ -124,7 +124,7 @@ extension SyncController: HFSwipeViewDataSource {
     func swipeView(_ swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: IndexPath, view: UIView) {
         if let label = view as? UILabel {
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: UIColor.black)
+            label.setBorder(1, color: UIColor.black)
             label.superview?.setBorder(1, color: UIColor.black)
         } else {
             assertionFailure("failed to retrieve button for index: \(indexPath.row)")

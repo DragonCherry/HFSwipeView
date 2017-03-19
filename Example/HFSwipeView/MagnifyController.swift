@@ -13,7 +13,20 @@ import TinyLog
 class MagnifyController: UIViewController {
     
     fileprivate let sampleCount: Int = 5
-    fileprivate var swipeView: HFSwipeView!
+    fileprivate var didSetupConstraints: Bool = false
+    
+    fileprivate lazy var swipeView: HFSwipeView = {
+        let view = HFSwipeView.newAutoLayout()
+        view.autoAlignEnabled = true
+        view.circulating = true        // true: circulating mode
+        view.dataSource = self
+        view.delegate = self
+        view.pageControlHidden = true
+        view.currentPage = 0
+        view.magnifyCenter = true
+        view.preferredMagnifyBonusRatio = 1.5
+        return view
+    }()
     fileprivate var currentView: UIView?
     fileprivate var itemSize: CGSize {
         return CGSize(width: 70, height: 70)
@@ -30,22 +43,24 @@ class MagnifyController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        swipeView = HFSwipeView(frame: swipeViewFrame)
-        swipeView.autoAlignEnabled = true
-        swipeView.circulating = true        // true: circulating mode
-        swipeView.dataSource = self
-        swipeView.delegate = self
-        swipeView.pageControlHidden = true
-        swipeView.currentPage = 0
-        swipeView.magnifyCenter = true
-        swipeView.preferredMagnifyBonusRatio = 1.5
+        
         view.addSubview(swipeView)
+    }
+    
+    override func updateViewConstraints() {
+        if !didSetupConstraints {
+            swipeView.autoSetDimension(.height, toSize: swipeViewFrame.height)
+            swipeView.autoPinEdge(toSuperviewEdge: .leading)
+            swipeView.autoPinEdge(toSuperviewEdge: .trailing)
+            swipeView.autoAlignAxis(toSuperviewAxis: .horizontal)
+            didSetupConstraints = true
+        }
+        super.updateViewConstraints()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.swipeView.frame = swipeViewFrame
-        self.swipeView.setBorder(0.5, color: .black)
+        self.swipeView.setBorder(1, color: .black)
     }
     
     func updateCellView(_ view: UIView, indexPath: IndexPath, isCurrent: Bool) {
@@ -63,7 +78,7 @@ class MagnifyController: UIViewController {
             
             label.textAlignment = .center
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: .black)
+            label.setBorder(1, color: .black)
             
         } else {
             assertionFailure("failed to retrieve UILabel for index: \(indexPath.row)")

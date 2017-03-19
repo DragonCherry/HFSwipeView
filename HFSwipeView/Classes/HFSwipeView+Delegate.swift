@@ -69,6 +69,9 @@ extension HFSwipeView: UICollectionViewDataSource {
             log("[CURRENT][\(displayIndex.row)/\(indexPath.row)]")
             if indexPath.row == currentRealPage {
                 dataSource.swipeView?(self, needUpdateCurrentViewForIndexPath: displayIndex, view: cellView!)
+            } else {
+                log("[NORMAL][\(displayIndex.row)/\(indexPath.row)]")
+                dataSource.swipeView?(self, needUpdateViewForIndexPath: displayIndex, view: cellView!)
             }
         } else {
             log("[NORMAL][\(displayIndex.row)/\(indexPath.row)]")

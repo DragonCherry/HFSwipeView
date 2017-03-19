@@ -29,7 +29,6 @@ extension HFSwipeView {
             return
         }
         let cells = collectionView.visibleCells
-        var cellsText = ""
         
         let left = self.collectionView.contentOffset.x + itemSize!.width / 2
         let right = self.collectionView.contentOffset.x + frame.size.width - itemSize!.width / 2
@@ -37,7 +36,6 @@ extension HFSwipeView {
         
         for cell in cells {
             let ratio = centerRatio(left, right: right, center: center, cell: cell)
-            cellsText += "(\(cell.tag):\(ratio)) "
             magnifyCell(cell, forRatio: ratio)
         }
     }

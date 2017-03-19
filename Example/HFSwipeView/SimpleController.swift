@@ -13,7 +13,17 @@ import TinyLog
 class SimpleController: UIViewController {
     
     fileprivate let sampleCount: Int = 4
-    fileprivate var swipeView: HFSwipeView!
+    fileprivate var didSetupConstraints: Bool = false
+    
+    fileprivate lazy var swipeView: HFSwipeView = {
+        let view = HFSwipeView.newAutoLayout()
+        view.autoAlignEnabled = true
+        view.circulating = false
+        view.dataSource = self
+        view.delegate = self
+        view.pageControlHidden = true
+        return view
+    }()
     fileprivate var currentView: UIView?
     fileprivate var itemSize: CGSize {
         return CGSize(width: 100, height: 100)
@@ -29,19 +39,23 @@ class SimpleController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        swipeView = HFSwipeView(frame: swipeViewFrame)
-        swipeView.autoAlignEnabled = true
-        swipeView.circulating = false
-        swipeView.dataSource = self
-        swipeView.delegate = self
-        swipeView.pageControlHidden = true
         view.addSubview(swipeView)
+    }
+    
+    override func updateViewConstraints() {
+        if !didSetupConstraints {
+            swipeView.autoSetDimension(.height, toSize: itemSize.height)
+            swipeView.autoPinEdge(toSuperviewEdge: .leading)
+            swipeView.autoPinEdge(toSuperviewEdge: .trailing)
+            swipeView.autoAlignAxis(toSuperviewAxis: .horizontal)
+            didSetupConstraints = true
+        }
+        super.updateViewConstraints()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.swipeView!.frame = swipeViewFrame
+        self.swipeView.setBorder(1, color: .black)
     }
     
     func updateCellView(_ view: UIView, indexPath: IndexPath, isCurrent: Bool) {
@@ -58,7 +72,7 @@ class SimpleController: UIViewController {
             
             label.textAlignment = .center
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: .black)
+            label.setBorder(1, color: .black)
             
         } else {
             assertionFailure("failed to retrieve UILabel for index: \(indexPath.row)")

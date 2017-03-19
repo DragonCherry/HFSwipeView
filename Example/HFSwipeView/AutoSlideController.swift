@@ -9,17 +9,17 @@
 import UIKit
 import HFSwipeView
 import TinyLog
-import PureLayout
 
 class AutoSlideController: UIViewController {
     
-    fileprivate let sampleCount: Int = 2
+    fileprivate let sampleCount: Int = 3
     fileprivate var didSetupConstraints: Bool = false
     
     fileprivate lazy var swipeView: HFSwipeView = {
         let view = HFSwipeView.newAutoLayout()
+        view.isDebug = true
         view.autoAlignEnabled = true
-        view.circulating = true        // true: circulating mode
+        view.circulating = true
         view.dataSource = self
         view.delegate = self
         view.pageControlHidden = true
@@ -44,7 +44,7 @@ class AutoSlideController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        swipeView.startAutoSlide(forTimeInterval: 2)
+        swipeView.startAutoSlide(forTimeInterval: 5)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -55,7 +55,9 @@ class AutoSlideController: UIViewController {
     override func updateViewConstraints() {
         if !didSetupConstraints {
             swipeView.autoSetDimension(.height, toSize: itemSize.height)
-            swipeView.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(top: 100, left: 0, bottom: 0, right: 0), excludingEdge: .bottom)
+            swipeView.autoPinEdge(toSuperviewEdge: .leading)
+            swipeView.autoPinEdge(toSuperviewEdge: .trailing)
+            swipeView.autoAlignAxis(toSuperviewAxis: .horizontal)
             didSetupConstraints = true
         }
         super.updateViewConstraints()
@@ -80,7 +82,7 @@ class AutoSlideController: UIViewController {
             }
             label.textAlignment = .center
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: .black)
+            label.setBorder(1, color: .black)
             
         } else {
             assertionFailure("failed to retrieve UILabel for index: \(indexPath.row)")
