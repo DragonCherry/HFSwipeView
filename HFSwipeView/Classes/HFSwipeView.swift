@@ -61,7 +61,7 @@ class HFSwipeViewFlowLayout: UICollectionViewFlowLayout {
 open class HFSwipeView: UIView {
     
     // MARK: Development
-    public var isDebug: Bool = true
+    public var isDebug: Bool = false
     
     // MARK: Private Constants
     internal var kSwipeViewCellContentTag: Int!
