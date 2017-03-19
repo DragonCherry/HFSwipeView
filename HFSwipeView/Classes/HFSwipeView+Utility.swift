@@ -10,14 +10,14 @@ import UIKit
 import TinyLog
 
 // MARK: Common Utilities
-internal func integer(_ object: AnyObject?, defaultValue: Int = 0) -> Int {
+internal func integer(_ object: Any?, defaultValue: Int = 0) -> Int {
     if let number = object as? NSNumber {
         return number.intValue
     } else {
         return defaultValue
     }
 }
-internal func cgfloat(_ object: AnyObject?, defaultValue: CGFloat = 0) -> CGFloat {
+internal func cgfloat(_ object: Any?, defaultValue: CGFloat = 0) -> CGFloat {
     if let number = object as? NSNumber {
         return CGFloat(number.floatValue)
     } else {

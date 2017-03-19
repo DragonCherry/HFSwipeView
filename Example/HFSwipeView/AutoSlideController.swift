@@ -9,7 +9,6 @@
 import UIKit
 import HFSwipeView
 import TinyLog
-import PureLayout
 
 class AutoSlideController: UIViewController {
     
@@ -55,7 +54,9 @@ class AutoSlideController: UIViewController {
     override func updateViewConstraints() {
         if !didSetupConstraints {
             swipeView.autoSetDimension(.height, toSize: itemSize.height)
-            swipeView.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(top: 100, left: 0, bottom: 0, right: 0), excludingEdge: .bottom)
+            swipeView.autoPinEdge(toSuperviewEdge: .leading)
+            swipeView.autoPinEdge(toSuperviewEdge: .trailing)
+            swipeView.autoAlignAxis(toSuperviewAxis: .horizontal)
             didSetupConstraints = true
         }
         super.updateViewConstraints()
@@ -80,7 +81,7 @@ class AutoSlideController: UIViewController {
             }
             label.textAlignment = .center
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: .black)
+            label.setBorder(1, color: .black)
             
         } else {
             assertionFailure("failed to retrieve UILabel for index: \(indexPath.row)")

@@ -21,12 +21,12 @@ extension HFSwipeView {
     internal func centeredOffsetForIndex(_ indexPath: IndexPath) -> CGPoint {
         var newX: CGFloat = 0
         if circulating {
-            let cellWidth = itemSpace + cgfloat(itemSize?.width as AnyObject?)
+            let cellWidth = itemSpace + cgfloat(itemSize?.width)
             newX += cellWidth * cgfloat(indexPath.row as AnyObject?)
             newX -= (frame.size.width - cellWidth) / 2
         } else {
-            let cellWidth = itemSpace + cgfloat(itemSize?.width as AnyObject?)
-            let cellSpace = cellWidth * cgfloat(indexPath.row as AnyObject?)
+            let cellWidth = itemSpace + cgfloat(itemSize?.width)
+            let cellSpace = cellWidth * cgfloat(indexPath.row)
             newX = cellSpace - (frame.size.width - cellWidth) / 2
             if newX < 0 {
                 newX = 0
@@ -55,8 +55,8 @@ extension HFSwipeView {
         } else {
             let centeredOffset = centeredOffsetForIndex(proposedIndexPath)
             let centeredIndexPath = indexPathForItemAtPoint(centeredOffset)
-            let currentIndex = integer(indexPathForItemAtPoint(CGPoint(x: collectionView.contentOffset.x, y: 0))?.row as AnyObject?)
-            if integer(centeredIndexPath?.row as AnyObject?) == currentIndex {
+            let currentIndex = integer(indexPathForItemAtPoint(CGPoint(x: collectionView.contentOffset.x, y: 0))?.row)
+            if integer(centeredIndexPath?.row) == currentIndex {
                 if isRtl {
                     if velocity.x > 0 {
                         return centeredOffsetForIndex(IndexPath(item: currentIndex - 1, section: 0))
@@ -80,9 +80,15 @@ extension HFSwipeView {
         }
     }
     
-    internal func setContentOffsetWithoutCallingDelegate(_ offset: CGPoint) {
+    internal func setContentOffsetWithoutCallingDelegate(_ contentOffset: CGPoint) {
         collectionView.delegate = nil
-        collectionView.contentOffset = offset
+        collectionView.contentOffset = contentOffset
+        collectionView.delegate = self
+    }
+    
+    internal func setContentSizeWithoutCallingDelegate(_ contentSize: CGSize) {
+        collectionView.delegate = nil
+        collectionView.contentSize = contentSize
         collectionView.delegate = self
     }
     

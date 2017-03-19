@@ -13,14 +13,24 @@ import TinyLog
 class SimpleCirculatingController: UIViewController {
     
     fileprivate let sampleCount: Int = 3
-    fileprivate var swipeView: HFSwipeView!
+    fileprivate var didSetupConstraints: Bool = false
+    
+    fileprivate lazy var swipeView: HFSwipeView = {
+        let view = HFSwipeView.newAutoLayout()
+        view.isDebug = true
+        view.autoAlignEnabled = true
+        view.circulating = true        // true: circulating mode
+        view.dataSource = self
+        view.delegate = self
+        view.pageControlHidden = true
+        view.currentPage = 0
+        view.autoAlignEnabled = true
+        return view
+    }()
     fileprivate var currentIndex: Int = 0
     fileprivate var currentView: UIView?
     fileprivate var itemSize: CGSize {
         return CGSize(width: 100, height: 100)
-    }
-    fileprivate var swipeViewFrame: CGRect {
-        return CGRect(x: 0, y: 100, width: self.view.frame.size.width, height: 100)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -30,21 +40,23 @@ class SimpleCirculatingController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        swipeView = HFSwipeView(frame: swipeViewFrame)
-        swipeView.autoAlignEnabled = true
-        swipeView.circulating = true        // true: circulating mode
-        swipeView.dataSource = self
-        swipeView.delegate = self
-        swipeView.pageControlHidden = true
-        swipeView.currentPage = 0
         view.addSubview(swipeView)
+    }
+    
+    override func updateViewConstraints() {
+        if !didSetupConstraints {
+            swipeView.autoSetDimension(.height, toSize: itemSize.height)
+            swipeView.autoPinEdge(toSuperviewEdge: .leading)
+            swipeView.autoPinEdge(toSuperviewEdge: .trailing)
+            swipeView.autoAlignAxis(toSuperviewAxis: .horizontal)
+            didSetupConstraints = true
+        }
+        super.updateViewConstraints()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.swipeView.frame = swipeViewFrame
-        self.swipeView.setBorder(0.5, color: .black)
+        self.swipeView.setBorder(1, color: .black)
     }
     
     func updateCellView(_ view: UIView, indexPath: IndexPath, isCurrent: Bool) {
@@ -62,7 +74,7 @@ class SimpleCirculatingController: UIViewController {
             }
             label.textAlignment = .center
             label.text = "\(indexPath.row)"
-            label.setBorder(0.5, color: .black)
+            label.setBorder(1, color: .black)
             
             log("[\(indexPath.row)] -> isCurrent: \(isCurrent)")
         } else {
