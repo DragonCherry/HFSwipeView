@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HFSwipeView'
-  s.version          = '1.1.4'
+  s.version          = '1.1.5'
   s.summary          = 'Infinite SwipeView for iOS.'
 
 # This description is used to generate tags and improve search results.
@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
 #   * Write the description between the DESC delimiters below.
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
-  s.description      = 'Swipe view loop through multiple view items infinitely, with UIPageControl attached.'
+  s.description      = 'Swipe view that loops infinitely through multiple view items with UIPageControl view on it.'
   s.homepage         = 'https://github.com/DragonCherry/HFSwipeView'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
