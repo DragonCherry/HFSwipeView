@@ -49,7 +49,7 @@ class MagnifyController: UIViewController {
     
     override func updateViewConstraints() {
         if !didSetupConstraints {
-            swipeView.autoSetDimension(.height, toSize: itemSize.height)
+            swipeView.autoSetDimension(.height, toSize: swipeViewFrame.height)
             swipeView.autoPinEdge(toSuperviewEdge: .leading)
             swipeView.autoPinEdge(toSuperviewEdge: .trailing)
             swipeView.autoAlignAxis(toSuperviewAxis: .horizontal)

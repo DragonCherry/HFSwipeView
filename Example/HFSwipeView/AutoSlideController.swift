@@ -12,13 +12,14 @@ import TinyLog
 
 class AutoSlideController: UIViewController {
     
-    fileprivate let sampleCount: Int = 2
+    fileprivate let sampleCount: Int = 3
     fileprivate var didSetupConstraints: Bool = false
     
     fileprivate lazy var swipeView: HFSwipeView = {
         let view = HFSwipeView.newAutoLayout()
+        view.isDebug = true
         view.autoAlignEnabled = true
-        view.circulating = true        // true: circulating mode
+        view.circulating = true
         view.dataSource = self
         view.delegate = self
         view.pageControlHidden = true
@@ -43,7 +44,7 @@ class AutoSlideController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        swipeView.startAutoSlide(forTimeInterval: 2)
+        swipeView.startAutoSlide(forTimeInterval: 5)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
