@@ -9,17 +9,27 @@
 import UIKit
 import HFSwipeView
 import TinyLog
+import PureLayout
 
 class AutoSlideController: UIViewController {
     
-    fileprivate let sampleCount: Int = 5
-    fileprivate var swipeView: HFSwipeView!
+    fileprivate let sampleCount: Int = 2
+    fileprivate var didSetupConstraints: Bool = false
+    
+    fileprivate lazy var swipeView: HFSwipeView = {
+        let view = HFSwipeView.newAutoLayout()
+        view.autoAlignEnabled = true
+        view.circulating = true        // true: circulating mode
+        view.dataSource = self
+        view.delegate = self
+        view.pageControlHidden = true
+        view.currentPage = 0
+        view.autoAlignEnabled = true
+        return view
+    }()
     fileprivate var currentView: UIView?
     fileprivate var itemSize: CGSize {
         return CGSize(width: 100, height: 100)
-    }
-    fileprivate var swipeViewFrame: CGRect {
-        return CGRect(x: 0, y: 100, width: view.frame.size.width, height: 100)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -29,31 +39,31 @@ class AutoSlideController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        swipeView = HFSwipeView(frame: swipeViewFrame)
-        swipeView.autoAlignEnabled = true
-        swipeView.circulating = true        // true: circulating mode
-        swipeView.dataSource = self
-        swipeView.delegate = self
-        swipeView.pageControlHidden = true
-        swipeView.currentPage = 0
-        swipeView.autoAlignEnabled = true
         view.addSubview(swipeView)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        swipeView.startAutoSlideForTimeInterval(2)
+        swipeView.startAutoSlide(forTimeInterval: 2)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        swipeView.stopAutoSlide()
+    }
+    
+    override func updateViewConstraints() {
+        if !didSetupConstraints {
+            swipeView.autoSetDimension(.height, toSize: itemSize.height)
+            swipeView.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(top: 100, left: 0, bottom: 0, right: 0), excludingEdge: .bottom)
+            didSetupConstraints = true
+        }
+        super.updateViewConstraints()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.swipeView.frame = swipeViewFrame
         self.swipeView.setBorder(0.5, color: .black)
-    }
-    
-    deinit {
-        swipeView.stopAutoSlide()
     }
     
     func updateCellView(_ view: UIView, indexPath: IndexPath, isCurrent: Bool) {

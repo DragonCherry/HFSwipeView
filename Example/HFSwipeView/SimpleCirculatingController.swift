@@ -12,7 +12,7 @@ import TinyLog
 
 class SimpleCirculatingController: UIViewController {
     
-    fileprivate let sampleCount: Int = 5
+    fileprivate let sampleCount: Int = 3
     fileprivate var swipeView: HFSwipeView!
     fileprivate var currentIndex: Int = 0
     fileprivate var currentView: UIView?
@@ -20,7 +20,7 @@ class SimpleCirculatingController: UIViewController {
         return CGSize(width: 100, height: 100)
     }
     fileprivate var swipeViewFrame: CGRect {
-        return CGRect(x: 0, y: 100, width: 375, height: 100)
+        return CGRect(x: 0, y: 100, width: self.view.frame.size.width, height: 100)
     }
     
     required init?(coder aDecoder: NSCoder) {

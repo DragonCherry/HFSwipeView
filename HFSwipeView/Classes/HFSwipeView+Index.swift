@@ -20,43 +20,64 @@ extension HFSwipeView {
         var minIdx: Int = -1
         var index = count - dummyCount
         
-        // traverse header
-        for i in 0..<dummyCount {
-            if dest == index {
-                let newDiff = from > i ? from - i : i - from
-                if newDiff < minDiff {
-                    minDiff = newDiff
-                    minIdx = i
+        // traverse left
+        let traverseLeft = {
+            for i in 0..<self.dummyCount {
+                if dest == index {
+                    let newDiff = from > i ? from - i : i - from
+                    if newDiff < minDiff {
+                        minDiff = newDiff
+                        minIdx = i
+                    }
                 }
+                index += 1
             }
-            index += 1
+            index = 0
         }
-        index = 0
         
         // traverse body
-        for i in dummyCount..<(dummyCount + count) {
-            if dest == index {
-                let newDiff = from > i ? from - i : i - from
-                if newDiff < minDiff {
-                    minDiff = newDiff
-                    minIdx = i
+        let traverseBody = {
+            for i in self.dummyCount..<(self.dummyCount + self.count) {
+                if dest == index {
+                    let newDiff = from > i ? from - i : i - from
+                    if newDiff < minDiff {
+                        minDiff = newDiff
+                        minIdx = i
+                    }
                 }
+                index += 1
             }
-            index += 1
+            index = 0
         }
-        index = 0
         
-        // traverse tail
-        for i in (dummyCount + count)..<(count + dummyCount * 2) {
-            if dest == index {
-                let newDiff = from > i ? from - i : i - from
-                if newDiff < minDiff {
-                    minDiff = newDiff
-                    minIdx = i
+        // traverse right
+        let traverseRight = {
+            for i in (self.dummyCount + self.count)..<(self.count + self.dummyCount * 2) {
+                if dest == index {
+                    let newDiff = from > i ? from - i : i - from
+                    if newDiff < minDiff {
+                        minDiff = newDiff
+                        minIdx = i
+                    }
                 }
+                index += 1
             }
-            index += 1
         }
+        
+        if isRtl {
+            traverseLeft()
+            traverseBody()
+            if minIdx < 0 {
+                traverseRight()
+            }
+        } else {
+            traverseRight()
+            traverseBody()
+            if minIdx < 0 {
+                traverseLeft()
+            }
+        }
+        
         log("[\(self.tag)]: from: \(from) to: \(minIdx)")
         return IndexPath(item: minIdx, section: 0)
     }
