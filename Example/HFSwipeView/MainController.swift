@@ -21,7 +21,6 @@ public enum TestSegue: String {
     case
     kSegueSimpleController                  = "kSegueSimpleController",
     kSegueSimpleCirculatingController       = "kSegueSimpleCirculatingController",
-    kSegueSyncController                    = "kSegueSyncController",
     kSegueMagnifyController                 = "kSegueMagnifyController",
     kSegueAutoSlideController               = "kSegueAutoSlideController",
     kSegueEdgePreviewController             = "kSegueEdgePreviewController"
@@ -29,7 +28,6 @@ public enum TestSegue: String {
     static let allValues: NSArray = [
         kSegueSimpleController.rawValue,
         kSegueSimpleCirculatingController.rawValue,
-        kSegueSyncController.rawValue,
         kSegueMagnifyController.rawValue,
         kSegueAutoSlideController.rawValue,
         kSegueEdgePreviewController.rawValue
@@ -54,14 +52,6 @@ class MainController: UIViewController {
         tableView.dataSource = self
         view.addSubview(tableView)
     }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        print("prepareForSegue - \(segue.identifier)")
-    }
     
     func titleForIndexPath(_ indexPath: IndexPath) -> String {
         var title: String!
@@ -71,12 +61,10 @@ class MainController: UIViewController {
         case 1:
             title = "Circulating"
         case 2:
-            title = "Sync"
-        case 3:
             title = "Magnifying"
-        case 4:
+        case 3:
             title = "Auto Slide"
-        case 5:
+        case 4:
             title = "Edge Preview"
         default:
             title = ""

@@ -92,6 +92,7 @@ extension HFSwipeView {
         collectionView.delegate = self
     }
     
+    @discardableResult
     internal func scrollViewFixOffset(_ scrollView: UIScrollView) -> Bool {
         let offset = scrollView.contentOffset
         let contentSize = scrollView.contentSize

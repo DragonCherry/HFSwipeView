@@ -14,7 +14,6 @@
 		8A0E7F671D6693DF008CE59E /* MainController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0E7F661D6693DF008CE59E /* MainController.swift */; };
 		8A0E7F691D66946D008CE59E /* SimpleController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0E7F681D66946D008CE59E /* SimpleController.swift */; };
 		8A0E7F6B1D669495008CE59E /* SimpleCirculatingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0E7F6A1D669495008CE59E /* SimpleCirculatingController.swift */; };
-		8A0E7F6D1D6694A3008CE59E /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0E7F6C1D6694A3008CE59E /* SyncController.swift */; };
 		8A0E7F6F1D6694B3008CE59E /* MagnifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0E7F6E1D6694B3008CE59E /* MagnifyController.swift */; };
 		8A7F83761D7404450017D412 /* AutoSlideController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7F83751D7404450017D412 /* AutoSlideController.swift */; };
 		8A7F83781D742D2A0017D412 /* EdgePreviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7F83771D742D2A0017D412 /* EdgePreviewController.swift */; };
@@ -34,7 +33,6 @@
 		8A0E7F661D6693DF008CE59E /* MainController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainController.swift; sourceTree = "<group>"; };
 		8A0E7F681D66946D008CE59E /* SimpleController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleController.swift; sourceTree = "<group>"; };
 		8A0E7F6A1D669495008CE59E /* SimpleCirculatingController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleCirculatingController.swift; sourceTree = "<group>"; };
-		8A0E7F6C1D6694A3008CE59E /* SyncController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncController.swift; sourceTree = "<group>"; };
 		8A0E7F6E1D6694B3008CE59E /* MagnifyController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MagnifyController.swift; sourceTree = "<group>"; };
 		8A7F83751D7404450017D412 /* AutoSlideController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoSlideController.swift; sourceTree = "<group>"; };
 		8A7F83771D742D2A0017D412 /* EdgePreviewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EdgePreviewController.swift; sourceTree = "<group>"; };
@@ -93,7 +91,6 @@
 				8A0E7F661D6693DF008CE59E /* MainController.swift */,
 				8A0E7F681D66946D008CE59E /* SimpleController.swift */,
 				8A0E7F6A1D669495008CE59E /* SimpleCirculatingController.swift */,
-				8A0E7F6C1D6694A3008CE59E /* SyncController.swift */,
 				8A0E7F6E1D6694B3008CE59E /* MagnifyController.swift */,
 				8A7F83751D7404450017D412 /* AutoSlideController.swift */,
 				8A7F83771D742D2A0017D412 /* EdgePreviewController.swift */,
@@ -216,7 +213,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		64FCD5DD9533EFC1F3284B4E /* [CP] Copy Pods Resources */ = {
@@ -256,7 +253,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8A0E7F6D1D6694A3008CE59E /* SyncController.swift in Sources */,
 				8A7F83781D742D2A0017D412 /* EdgePreviewController.swift in Sources */,
 				8A7F83761D7404450017D412 /* AutoSlideController.swift in Sources */,
 				8A0E7F671D6693DF008CE59E /* MainController.swift in Sources */,

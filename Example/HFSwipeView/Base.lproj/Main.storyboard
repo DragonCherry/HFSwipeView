@@ -1,8 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="yrt-sN-TsI">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="yrt-sN-TsI">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Main Controller-->
@@ -14,15 +18,14 @@
                         <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                     <navigationItem key="navigationItem" id="9KL-D3-mcc"/>
                     <connections>
                         <segue destination="fm1-HV-4oo" kind="show" identifier="kSegueSimpleController" id="RIQ-Ju-Tgt"/>
                         <segue destination="x0g-Ug-Iy8" kind="show" identifier="kSegueSimpleCirculatingController" id="T4Y-Qt-deZ"/>
-                        <segue destination="b7f-QG-mi0" kind="show" identifier="kSegueSyncController" id="y9c-6A-YVM"/>
                         <segue destination="TAJ-ja-p7M" kind="show" identifier="kSegueMagnifyController" id="Z3K-4Y-VtO"/>
                         <segue destination="x6c-ke-ynX" kind="show" identifier="kSegueAutoSlideController" id="ulK-lg-rbh"/>
                         <segue destination="SBp-Ls-7fo" kind="show" identifier="kSegueEdgePreviewController" id="bna-2S-wl1"/>
@@ -41,14 +44,14 @@
                         <viewControllerLayoutGuide type="bottom" id="KCJ-Vp-6WY"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="NRZ-Ag-EEc">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nhq-vE-ZgP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2103" y="2617"/>
+            <point key="canvasLocation" x="2102" y="1849"/>
         </scene>
         <!--Auto Slide Controller-->
         <scene sceneID="rzg-lu-BcS">
@@ -59,14 +62,14 @@
                         <viewControllerLayoutGuide type="bottom" id="PPK-73-RBf"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="vpT-q7-vq5">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="S8q-VA-VEw" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2103" y="1923"/>
+            <point key="canvasLocation" x="2102" y="1179"/>
         </scene>
         <!--Magnify Controller-->
         <scene sceneID="9bX-hN-SJY">
@@ -77,14 +80,14 @@
                         <viewControllerLayoutGuide type="bottom" id="ndB-Zh-SSx"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="EYY-J3-goM">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="y9B-Ft-gV4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2103" y="1230"/>
+            <point key="canvasLocation" x="2102" y="506"/>
         </scene>
         <!--Simple Controller-->
         <scene sceneID="ehd-5H-Igf">
@@ -95,9 +98,9 @@
                         <viewControllerLayoutGuide type="bottom" id="5dI-xo-X17"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="buV-r0-Usp">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yVo-m9-88k" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -113,32 +116,14 @@
                         <viewControllerLayoutGuide type="bottom" id="Nv1-bm-uvh"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="tRC-Wx-9GQ">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cNU-fP-Zim" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2103" y="-163"/>
-        </scene>
-        <!--Sync Controller-->
-        <scene sceneID="ZKi-fN-jRS">
-            <objects>
-                <viewController id="b7f-QG-mi0" customClass="SyncController" customModule="HFSwipeView_Example" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="iW0-Q3-r6r"/>
-                        <viewControllerLayoutGuide type="bottom" id="rir-ct-u6a"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="8ee-ZX-NQo">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="4Ra-K5-4Nb" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2103" y="533"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="KNB-Rx-scu">

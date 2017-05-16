@@ -42,30 +42,6 @@ extension HFSwipeView {
         
     }
     
-    internal func postSync(_ contentOffset: CGPoint, contentSize: CGSize) {
-        if let syncView = self.syncView {
-            syncView.notifiedSync(self)
-        }
-    }
-    
-    internal func notifiedSync(_ poster: HFSwipeView) {
-        guard let posterItemSize = poster.itemSize, let receiverItemSize = self.itemSize else {
-            logw("itemSize is not ready.")
-            return
-        }
-
-        let posterOffset = poster.collectionView.contentOffset
-        let posterSize = poster.collectionView.contentSize
-        
-        let receiverSize = self.collectionView.contentSize
-        let receiverOffset = self.collectionView.contentOffset
-        
-        let ratio = (posterOffset.x + (poster.frame.size.width - posterItemSize.width) / 2) / posterSize.width
-        let newOffset = CGPoint(x: receiverSize.width * ratio - (frame.size.width - receiverItemSize.width) / 2, y: receiverOffset.y)
-        setContentOffsetWithoutCallingDelegate(newOffset)
-        updateIndexBasedOnContentOffset()
-    }
-    
     internal func autoAlign(_ scrollView: UIScrollView, indexPath: IndexPath) {
         if autoAlignEnabled {
             if !circulating {

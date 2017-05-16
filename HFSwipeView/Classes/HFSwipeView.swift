@@ -101,9 +101,6 @@ open class HFSwipeView: UIView {
     internal var autoSlideIntervalBackupForLaterUse: TimeInterval = -1
     internal var autoSlideTimer: Timer?
     
-    // MARK: Sync View
-    open var syncView: HFSwipeView?
-    
     // MARK: Public Properties
     open var currentPage: Int = -1
     open var pageControlHeight: CGFloat = 20
@@ -227,6 +224,10 @@ open class HFSwipeView: UIView {
     open override func layoutSubviews() {
         super.layoutSubviews()
         layoutViews()
+    }
+    
+    deinit {
+        logi("Successfully released HFSwipeView object.")
     }
     
     fileprivate func prepareForInteraction() {
