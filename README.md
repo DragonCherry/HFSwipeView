@@ -22,8 +22,6 @@ Any advice and suggestions will be greatly appreciated.
 
 - supports auto-align selected cell on center of the view
 
-- supports sync mode between two HFSwipeView(normally used for categorized header/content view)
-
 - supports auto-slide(in circulating mode only) based on given NSTimeInterval, you can use it like banner-style view.
 
 - supports magnifying mode(magnifies selected-center cell)
