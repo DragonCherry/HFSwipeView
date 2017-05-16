@@ -15,20 +15,26 @@ class EdgePreviewController: UIViewController {
     // sample item count for two swipe view
     fileprivate let sampleCount: Int = 10
     fileprivate var currentFullView: UILabel?
+    fileprivate var didSetupConstraints: Bool = false
     
-    // where full swipe view will be placed
-    fileprivate var fullViewRect: CGRect {
-        return CGRect(
-            x: 0,
-            y: 100,
-            width: self.view.frame.size.width,
-            height: self.view.frame.size.width)
-    }
     fileprivate var fullItemSize: CGSize {
-        return CGSize(width: self.view.frame.size.width - 70, height: self.view.frame.size.width)
+        return CGSize(width: swipeView.frame.size.width - 70, height: swipeView.frame.size.height)
     }
     
-    fileprivate var swipeView: HFSwipeView!
+    fileprivate lazy var swipeView: HFSwipeView = {
+        let view = HFSwipeView.newAutoLayout()
+        view.isDebug = true
+        view.autoAlignEnabled = true
+        view.circulating = true
+        view.dataSource = self
+        view.delegate = self
+        view.recycleEnabled = true
+        view.currentPage = 0
+        view.currentPageIndicatorTintColor = UIColor.black
+        view.pageIndicatorTintColor = UIColor.lightGray
+        view.backgroundColor = UIColor.clear
+        return view
+    }()
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -37,19 +43,19 @@ class EdgePreviewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        swipeView = HFSwipeView(frame: fullViewRect)
-        swipeView.isDebug = true
-        swipeView.autoAlignEnabled = true
-        swipeView.circulating = true
-        swipeView.dataSource = self
-        swipeView.delegate = self
-        swipeView.recycleEnabled = true
-        swipeView.currentPage = 0
-        swipeView.currentPageIndicatorTintColor = UIColor.black
-        swipeView.pageIndicatorTintColor = UIColor.lightGray
-        swipeView.backgroundColor = UIColor.clear
-        self.view.addSubview(self.swipeView)
+        view.addSubview(swipeView)
+    }
+    
+    override func updateViewConstraints() {
+        if !didSetupConstraints {
+            swipeView.autoMatch(.height, to: .height, of: self.view, withMultiplier: 0.8)
+            swipeView.autoMatch(.width, to: .width, of: self.view)
+            swipeView.autoPinEdge(toSuperviewEdge: .leading)
+            swipeView.autoPinEdge(toSuperviewEdge: .trailing)
+            swipeView.autoAlignAxis(toSuperviewAxis: .horizontal)
+            didSetupConstraints = true
+        }
+        super.updateViewConstraints()
     }
 }
 

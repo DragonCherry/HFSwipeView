@@ -17,7 +17,7 @@ extension HFSwipeView: UICollectionViewDataSource {
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        log(": \(realViewCount)")
+        log("\(realViewCount)")
         return realViewCount
     }
     
@@ -209,8 +209,7 @@ extension HFSwipeView: UIScrollViewDelegate {
         }
         
         if circulating {
-            _ = scrollViewFixOffset(scrollView)
-            postSync(scrollView.contentOffset, contentSize: scrollView.contentSize)
+            scrollViewFixOffset(scrollView)
         }
         
         updateIndexBasedOnContentOffset()
