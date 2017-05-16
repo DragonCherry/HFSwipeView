@@ -12,13 +12,31 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 If you wanna check how it works, click link below and press - "Tap to Play".
 https://www.cocoacontrols.com/controls/hfswipeview
 
-A swipe view loops through multiple view items infinitely, with UIPageControl attached. It's very similar to ViewPager from android but it also supports circulation between multiple views. In circulating mode, it will automatically locates current view at the center of swipe view.
+A swipe view loops through multiple view items infinitely, with UIPageControl attached. It's very similar to ViewPager from android but it also supports circulation between multiple views. In circulating mode(infinite loop), it will automatically locates current view at the center of swipe view.
 
 Any advice and suggestions will be greatly appreciated.
 
+## Features
+
+- supports circulating mode(inifinite loop)
+
+- supports auto-align selected cell on center of the view
+
+- supports auto-slide(in circulating mode only) based on given NSTimeInterval, you can use it like banner-style view.
+
+- supports magnifying mode(magnifies selected-center cell)
+
+- supports auto shrinking UIPageControl at the bottom area of the HFSwipeView
+
 ## Requirements
 
-Uses HFUtility in HFSwipeView.
+Xcode8, Swift 3
+
+## Version
+
+for Swift 2.#, refer to version 1.0.0
+
+after Swift 3.#, refer to development/master branch or last released version.
 
 ## Installation
 
