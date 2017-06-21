@@ -40,6 +40,7 @@ class AutoSlideController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(swipeView)
+        title = "Auto Slide"
     }
     
     override func viewDidAppear(_ animated: Bool) {

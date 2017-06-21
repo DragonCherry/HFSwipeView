@@ -1,38 +1,36 @@
 //
-//  MagnifyController.swift
-//  HFSwipeView
+//  ImageCirculatingController.swift
+//  HFSwipeView_Example
 //
-//  Created by DragonCherry on 8/19/16.
-//  Copyright © 2016 CocoaPods. All rights reserved.
+//  Created by DragonCherry on 6/21/17.
+//  Copyright © 2017 CocoaPods. All rights reserved.
 //
 
 import UIKit
 import HFSwipeView
 import TinyLog
 
-class MagnifyController: UIViewController {
+class ImageCirculatingController: UIViewController {
     
-    fileprivate let sampleCount: Int = 5
+    fileprivate let sampleCount: Int = 6
     fileprivate var didSetupConstraints: Bool = false
     
     fileprivate lazy var swipeView: HFSwipeView = {
         let view = HFSwipeView.newAutoLayout()
+        view.isDebug = true
         view.autoAlignEnabled = true
         view.circulating = true        // true: circulating mode
         view.dataSource = self
         view.delegate = self
         view.pageControlHidden = true
         view.currentPage = 0
-        view.magnifyCenter = true
-        view.preferredMagnifyBonusRatio = 1.5
+        view.autoAlignEnabled = true
         return view
     }()
+    fileprivate var currentIndex: Int = 0
     fileprivate var currentView: UIView?
     fileprivate var itemSize: CGSize {
-        return CGSize(width: 70, height: 70)
-    }
-    fileprivate var swipeViewFrame: CGRect {
-        return CGRect(x: 0, y: 100, width: view.frame.size.width, height: 100)
+        return CGSize(width: 250, height: view.frame.size.width)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -43,12 +41,12 @@ class MagnifyController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(swipeView)
-        title = "Magnifying"
+        title = "Image"
     }
     
     override func updateViewConstraints() {
         if !didSetupConstraints {
-            swipeView.autoSetDimension(.height, toSize: swipeViewFrame.height)
+            swipeView.autoSetDimension(.height, toSize: itemSize.height)
             swipeView.autoPinEdge(toSuperviewEdge: .leading)
             swipeView.autoPinEdge(toSuperviewEdge: .trailing)
             swipeView.autoAlignAxis(toSuperviewAxis: .horizontal)
@@ -64,21 +62,21 @@ class MagnifyController: UIViewController {
     
     func updateCellView(_ view: UIView, indexPath: IndexPath, isCurrent: Bool) {
         
-        if let label = view as? UILabel {
-            
+        if let imageView = view as? UIImageView {
             if isCurrent {
-                // old view
-                currentView?.backgroundColor = .white
-                currentView = label
-                currentView?.backgroundColor = .yellow
+                if imageView != currentView {
+                    currentView?.backgroundColor = .clear
+                }
+                imageView.backgroundColor = .yellow
+                currentView = imageView
+                currentIndex = indexPath.row
             } else {
-                label.backgroundColor = .white
+                imageView.backgroundColor = .clear
             }
+            imageView.image = UIImage(named: "IMG_0\(indexPath.row + 1)")
+            imageView.setBorder(1, color: .black)
             
-            label.textAlignment = .center
-            label.text = "\(indexPath.row)"
-            label.setBorder(1, color: .black)
-            
+            log("[\(indexPath.row)] -> isCurrent: \(isCurrent)")
         } else {
             assertionFailure("failed to retrieve UILabel for index: \(indexPath.row)")
         }
@@ -86,7 +84,7 @@ class MagnifyController: UIViewController {
 }
 
 // MARK: - HFSwipeViewDelegate
-extension MagnifyController: HFSwipeViewDelegate {
+extension ImageCirculatingController: HFSwipeViewDelegate {
     func swipeView(_ swipeView: HFSwipeView, didFinishScrollAtIndexPath indexPath: IndexPath) {
         log("HFSwipeView(\(swipeView.tag)) -> \(indexPath.row)")
     }
@@ -101,29 +99,26 @@ extension MagnifyController: HFSwipeViewDelegate {
 }
 
 // MARK: - HFSwipeViewDataSource
-extension MagnifyController: HFSwipeViewDataSource {
-    func swipeViewItemDistance(_ swipeView: HFSwipeView) -> CGFloat {
-        return 30   // left pad 15 + right pad 15
-    }
+extension ImageCirculatingController: HFSwipeViewDataSource {
     func swipeViewItemSize(_ swipeView: HFSwipeView) -> CGSize {
-        // view [pad 15 + width 70 + pad 15] -> displays 100 width of cell
-        return CGSize(width: 70, height: 100)
+        return itemSize
     }
     func swipeViewItemCount(_ swipeView: HFSwipeView) -> Int {
         return sampleCount
     }
     func swipeView(_ swipeView: HFSwipeView, viewForIndexPath indexPath: IndexPath) -> UIView {
-        let contentLabel = UILabel(frame: CGRect(origin: CGPoint(x: 0, y: 15), size: CGSize(width: 70, height: 70)))
-        contentLabel.text = "\(indexPath.row)"
-        contentLabel.textAlignment = .center
-        contentLabel.layer.cornerRadius = 35
-        contentLabel.layer.masksToBounds = true
-        return contentLabel
+        log("[\(indexPath.row)]")
+        let imageView = UIImageView(frame: CGRect(origin: .zero, size: itemSize))
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        return imageView
     }
     func swipeView(_ swipeView: HFSwipeView, needUpdateViewForIndexPath indexPath: IndexPath, view: UIView) {
+        log("[\(indexPath.row)]")
         updateCellView(view, indexPath: indexPath, isCurrent: false)
     }
     func swipeView(_ swipeView: HFSwipeView, needUpdateCurrentViewForIndexPath indexPath: IndexPath, view: UIView) {
+        log("[\(indexPath.row)]")
         updateCellView(view, indexPath: indexPath, isCurrent: true)
     }
 }

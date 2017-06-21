@@ -44,6 +44,7 @@ class EdgePreviewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(swipeView)
+        title = "Edge Preview"
     }
     
     override func updateViewConstraints() {
