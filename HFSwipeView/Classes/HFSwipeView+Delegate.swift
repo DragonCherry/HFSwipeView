@@ -29,7 +29,15 @@ extension HFSwipeView: UICollectionViewDataSource {
         }
     }
     
-    internal func cellForItemInCirculationMode(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+    func layout(cell: UICollectionViewCell, forCellView cellView: UIView) {
+        // locate content view at center of given cell
+        cellView.frame.origin.x = itemSpace / 2
+        if magnifyCenter {
+            applyMagnifyCenter(forCell: cell)
+        }
+    }
+    
+    func cellForItemInCirculationMode(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell: UICollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: kSwipeViewCellIdentifier, for: indexPath)
         guard let dataSource = self.dataSource else {
@@ -57,13 +65,8 @@ extension HFSwipeView: UICollectionViewDataSource {
         }
         indexViewMapper[indexPath.row] = cellView
         
-        // locate content view at center of given cell
-        cellView!.frame.origin.x = itemSpace / 2
-        
-        if magnifyCenter {
-            cell.tag = indexPath.row
-            applyMagnifyCenter(forCell: cell)
-        }
+        cell.tag = indexPath.row
+        layout(cell: cell, forCellView: cellView!)
         
         if displayIndex.row == currentPage {
             log("[CURRENT][\(displayIndex.row)/\(indexPath.row)]")

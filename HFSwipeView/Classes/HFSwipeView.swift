@@ -363,4 +363,10 @@ extension HFSwipeView {
     open func deselectItemAtPath(_ indexPath: IndexPath, animated: Bool) {
         collectionView.deselectItem(at: indexPath, animated: animated)
     }
+    
+    open func reloadData() {
+        initialized = false
+        collectionView.reloadData()
+        layoutViews()
+    }
 }

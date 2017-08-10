@@ -55,11 +55,7 @@ extension HFSwipeView {
             } else {
                 bonusRatio = (ratio + 1) * (bonusRatio - 1) + 1
             }
-            
-            let viewWidth = itemSize!.width * bonusRatio
             cellView.transform = CGAffineTransform(scaleX: bonusRatio, y: bonusRatio)
-            let space = (cellWidth - viewWidth) / 2
-            cellView.frame.origin = CGPoint(x: space, y: cellView.frame.origin.y)
         }
     }
     

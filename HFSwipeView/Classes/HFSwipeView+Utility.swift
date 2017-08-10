@@ -46,7 +46,7 @@ extension HFSwipeView {
             realIndexLabel = label
         } else {
             realIndexLabel = UILabel(frame: CGRect(x: 5, y: 5, width: 50, height: 20))
-            realIndexLabel.textColor = .black
+            realIndexLabel.textColor = .green
             realIndexLabel.font = .systemFont(ofSize: 8)
             realIndexLabel.tag = 0x5000
             view.addSubview(realIndexLabel)
@@ -55,7 +55,7 @@ extension HFSwipeView {
             dispIndexLabel = label
         } else {
             dispIndexLabel = UILabel(frame: CGRect(x: 5, y: 25, width: 50, height: 20))
-            dispIndexLabel.textColor = .black
+            dispIndexLabel.textColor = .green
             dispIndexLabel.font = .systemFont(ofSize: 8)
             dispIndexLabel.tag = 0x5001
             view.addSubview(dispIndexLabel)

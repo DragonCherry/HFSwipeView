@@ -12,7 +12,7 @@ import TinyLog
 
 class ImageCirculatingController: UIViewController {
     
-    fileprivate let sampleCount: Int = 6
+    fileprivate var sampleCount: Int = 6
     fileprivate var didSetupConstraints: Bool = false
     
     fileprivate lazy var swipeView: HFSwipeView = {
@@ -26,6 +26,15 @@ class ImageCirculatingController: UIViewController {
         view.currentPage = 0
         view.autoAlignEnabled = true
         return view
+    }()
+    fileprivate lazy var reloadButton: UIButton = {
+        let button = UIButton.newAutoLayout()
+        button.setTitle("Reload", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.addTarget(self, action: #selector(pressedReload), for: .touchUpInside)
+        button.layer.borderColor = UIColor.black.cgColor
+        button.layer.borderWidth = 1
+        return button
     }()
     fileprivate var currentIndex: Int = 0
     fileprivate var currentView: UIView?
@@ -41,6 +50,7 @@ class ImageCirculatingController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(swipeView)
+        view.addSubview(reloadButton)
         title = "Image"
     }
     
@@ -50,6 +60,9 @@ class ImageCirculatingController: UIViewController {
             swipeView.autoPinEdge(toSuperviewEdge: .leading)
             swipeView.autoPinEdge(toSuperviewEdge: .trailing)
             swipeView.autoAlignAxis(toSuperviewAxis: .horizontal)
+            reloadButton.autoSetDimensions(to: CGSize(width: 150, height: 50))
+            reloadButton.autoAlignAxis(.vertical, toSameAxisOf: swipeView)
+            reloadButton.autoPinEdge(.top, to: .bottom, of: swipeView, withOffset: 20)
             didSetupConstraints = true
         }
         super.updateViewConstraints()
@@ -73,13 +86,21 @@ class ImageCirculatingController: UIViewController {
             } else {
                 imageView.backgroundColor = .clear
             }
-            imageView.image = UIImage(named: "IMG_0\(indexPath.row + 1)")
+            imageView.image = UIImage(named: "IMG_0\((indexPath.row % 6) + 1)")
             imageView.setBorder(1, color: .black)
             
             log("[\(indexPath.row)] -> isCurrent: \(isCurrent)")
         } else {
             assertionFailure("failed to retrieve UILabel for index: \(indexPath.row)")
         }
+    }
+}
+
+// MARK: - Reload
+extension ImageCirculatingController {
+    func pressedReload(sender: UIButton) {
+        sampleCount += 1
+        swipeView.reloadData()
     }
 }
 
