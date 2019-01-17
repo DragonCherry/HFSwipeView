@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import TinyLog
 
 // MARK: Common Utilities
 internal func integer(_ object: Any?, defaultValue: Int = 0) -> Int {

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import TinyLog
 
 // MARK: - Magnify
 extension HFSwipeView {

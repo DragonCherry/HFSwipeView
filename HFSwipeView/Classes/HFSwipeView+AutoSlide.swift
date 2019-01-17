@@ -7,14 +7,13 @@
 //
 
 import UIKit
-import TinyLog
 
 // MARK: - Auto Slide
 extension HFSwipeView {
     /// zero or minus interval disables auto slide.
     public func startAutoSlide(forTimeInterval timeInterval: TimeInterval) {
         if !circulating {
-            logw("Cannot use auto-slide without circulation mode.")
+            print("Cannot use auto-slide without circulation mode.")
             return
         }
         if timeInterval > 0 {
@@ -31,7 +30,7 @@ extension HFSwipeView {
     
     public func pauseAutoSlide() {
         if !circulating {
-            logw("Cannot use auto-slide without circulation mode.")
+            print("Cannot use auto-slide without circulation mode.")
             return
         }
         if autoSlideInterval > 0 {
@@ -44,7 +43,7 @@ extension HFSwipeView {
     
     public func resumeAutoSlide() {
         if !circulating {
-            logw("Cannot use auto-slide without circulation mode.")
+            print("Cannot use auto-slide without circulation mode.")
             return
         }
         if autoSlideIntervalBackupForLaterUse > 0 {
@@ -54,7 +53,7 @@ extension HFSwipeView {
     
     public func stopAutoSlide() {
         if !circulating {
-            logw("Cannot use auto-slide without circulation mode.")
+            print("Cannot use auto-slide without circulation mode.")
             return
         }
         autoSlideInterval = -1
@@ -63,7 +62,7 @@ extension HFSwipeView {
         autoSlideTimer = nil
     }
     
-    public func autoSlideCallback(_ timer: Timer) {
+    @objc func autoSlideCallback(_ timer: Timer) {
         guard count != 0 else {
             return
         }
