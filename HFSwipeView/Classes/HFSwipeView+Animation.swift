@@ -40,7 +40,6 @@ extension HFSwipeView {
     }
     
     internal func magnifyCell(_ cell: UICollectionViewCell, forRatio ratio: CGFloat) {
-        
         if let cellView = cell.contentView.viewWithTag(kSwipeViewCellContentTag) {
             var bonusRatio: CGFloat = preferredMagnifyBonusRatio
             let cellWidth = itemSize!.width + itemSpace
@@ -63,7 +62,6 @@ extension HFSwipeView {
     }
     
     internal func centerRatio(_ left: CGFloat, right: CGFloat, center: CGFloat, cell: UICollectionViewCell) -> CGFloat {
-        
         var ratio: CGFloat = 0
         let divider = center - left
         if cell.center.x < center {
