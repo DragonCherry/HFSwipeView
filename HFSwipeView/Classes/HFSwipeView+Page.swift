@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import TinyLog
+//import TinyLog
 
 // MARK: - Page Control
 extension HFSwipeView {
