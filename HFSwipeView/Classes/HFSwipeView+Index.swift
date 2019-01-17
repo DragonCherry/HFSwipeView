@@ -7,7 +7,7 @@
 //
 
 import UIKit
-//import TinyLog
+import TinyLog
 
 // MARK: - Index Control
 extension HFSwipeView {

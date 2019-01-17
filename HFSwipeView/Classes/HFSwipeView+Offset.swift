@@ -7,7 +7,7 @@
 //
 
 import UIKit
-//import TinyLog
+import TinyLog
 
 // MARK: - Private Methods: Offset Control
 extension HFSwipeView {

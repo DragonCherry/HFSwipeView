@@ -7,7 +7,7 @@
 //
 
 import UIKit
-//import TinyLog
+import TinyLog
 import PureLayout
 
 // MARK: - HFSwipeViewDataSource
