@@ -1,0 +1,31 @@
+{
+  "name": "HFSwipeView",
+  "version": "2.0.1",
+  "summary": "Infinite SwipeView for iOS.",
+  "description": "Swipe view that loops infinitely through multiple view items with UIPageControl view on it.",
+  "homepage": "https://github.com/DragonCherry/HFSwipeView",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "DragonCherry": "dragoncherry@naver.com"
+  },
+  "source": {
+    "git": "https://github.com/gammapeit/HFSwipeView.git",
+    "tag": "2.0.1"
+  },
+  "social_media_url": "https://twitter.com/gammapeit",
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "HFSwipeView/Classes/**/*",
+  "dependencies": {
+    "TinyLog": [
+
+    ],
+    "PureLayout": [
+
+    ]
+  }
+}

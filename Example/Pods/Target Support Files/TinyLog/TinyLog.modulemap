@@ -1,0 +1,6 @@
+framework module TinyLog {
+  umbrella header "TinyLog-umbrella.h"
+
+  export *
+  module * { export * }
+}
