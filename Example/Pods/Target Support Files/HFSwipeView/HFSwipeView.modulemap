@@ -1,0 +1,6 @@
+framework module HFSwipeView {
+  umbrella header "HFSwipeView-umbrella.h"
+
+  export *
+  module * { export * }
+}
