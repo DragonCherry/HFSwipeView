@@ -1,3 +1,6 @@
+# This repository won't updated anymore. Due to structural problem(not based on auto layout & unstable when orientation change), I'm not recommend this source to use for infinite cells. Maybe I'll create a new, better and cleaner solution for solving complex infinite cell problems but not here!
+
+
 # HFSwipeView
 
 [![CI Status](http://img.shields.io/travis/DragonCherry/HFSwipeView.svg?style=flat)](https://travis-ci.org/DragonCherry/HFSwipeView)
